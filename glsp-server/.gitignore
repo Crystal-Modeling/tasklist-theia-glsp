@@ -1,0 +1,4 @@
+bundle/
+tsconfig.tsbuildinfo
+node_modules
+lib

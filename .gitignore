@@ -1,0 +1,9 @@
+
+.temp
+*.log
+
+## Web ##
+*.log
+
+**/*-browser-app/**
+!**/*-browser-app/package.json
