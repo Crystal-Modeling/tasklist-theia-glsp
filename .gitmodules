@@ -1,0 +1,3 @@
+[submodule "glsp-client/vsc-extensions/tasklist-lang"]
+	path = glsp-client/vsc-extensions/tasklist-lang
+	url = git@github.com:Crystal-VPL/tasklist-lang.git

@@ -1,0 +1,7 @@
+task 1st "First task"
+task 2nd "Second task"
+task an "Another task"
+
+task "First" -> an
+next "Second" -> 2nd
+next "Third" -> 1st

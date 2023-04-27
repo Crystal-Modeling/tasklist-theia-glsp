@@ -14,6 +14,7 @@
     "@theia/process": "1.34.0",
     "@theia/terminal": "1.34.0",
     "@theia/workspace": "1.34.0",
+    "@theia/plugin-ext-vscode": "1.34.0",
     "@eclipse-glsp-examples/tasklist-theia": "1.0.0-theia1.34.0"
   },
   "devDependencies": {
@@ -22,8 +23,8 @@
   "scripts": {
     "prepare": "yarn build",
     "build": "theia build --mode development",
-    "start": "theia start --TASKLIST_GLSP=5007 --root-dir=../workspace",
-    "start:external": "theia start --TASKLIST_GLSP=5007 --root-dir=../workspace --debug",
+    "start": "theia start --TASKLIST_GLSP=5007 --root-dir=../workspace --plugins=local-dir:../vsc-extensions",
+    "start:external": "theia start --TASKLIST_GLSP=5007 --root-dir=../workspace --debug --plugins=local-dir:../vsc-extensions",
     "watch": "theia build --watch --mode development"
   },
   "theia": {
