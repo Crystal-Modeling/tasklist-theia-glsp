@@ -1,7 +1,4 @@
-task 1st "First task"
-task 2nd "Second task"
-task an "Another task"
-
-task "First" -> an
-next "Second" -> 2nd
-next "Third" -> 1st
+task 1st "First task" -> 2nd
+task 2nd "Second task" -> an
+task an "Another task" -> 4th
+task 4th "Call it a day! :)"
