@@ -79,7 +79,7 @@ yarn build:server
 To have tasklist-lang prepackaged into Theia build, it has to be built using the following command (from [`vsc-extensions/tasklist-lang`](glsp-client/vsc-extensions/tasklist-lang)) directory:
 
 ```bash
-npx run vscode:prepublish
+npm run langium:generate && npm run build && npm run vscode:prepublish
 ```
 
 ❗ You don't have to package it into VSIX file (though you could, with `npx vsce package` command).
