@@ -24,6 +24,7 @@ import {
     LabelEditValidator,
     ModelState,
     OperationHandlerConstructor,
+    RequestModelActionHandler,
     SourceModelStorage
 } from '@eclipse-glsp/server-node';
 import { BindingTarget } from '@eclipse-glsp/server-node/lib/di/binding-target';
@@ -31,6 +32,7 @@ import { injectable } from 'inversify';
 import { CreateTaskHandler } from '../handler/create-task-node-handler';
 import { CreateTransitionHandler } from '../handler/create-transition-handler';
 import { DeleteElementHandler } from '../handler/delete-element-handler';
+import { LmsRequestModelActionHandler } from '../handler/lms-request-model-action-handler';
 import { TaskListApplyLabelEditHandler } from '../handler/tasklist-apply-label-edit-handler';
 import { TaskListChangeBoundsHandler } from '../handler/tasklist-change-bounds-handler';
 import { TaskListLabelEditValidator } from '../handler/tasklist-label-edit-validator';
@@ -63,6 +65,7 @@ export class TaskListDiagramModule extends DiagramModule {
     protected override configureActionHandlers(binding: InstanceMultiBinding<ActionHandlerConstructor>): void {
         super.configureActionHandlers(binding);
         binding.add(ComputedBoundsActionHandler);
+        binding.rebind(RequestModelActionHandler, LmsRequestModelActionHandler);
     }
 
     protected override configureOperationHandlers(binding: InstanceMultiBinding<OperationHandlerConstructor>): void {
