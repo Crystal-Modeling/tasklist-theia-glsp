@@ -102,7 +102,22 @@ This will launch the example in the browser with an embedded GLSP server on [loc
 
 ❗ You should only run Theia from Chrome browser! Firefox fails to render some features, apparently.
 
-To debug the involved components, the [VS Code workspace](node-json-theia.code-workspace) offers launch configs, available in the `Run and Debug` view (Ctrl + Shift + D).
+### Debugging the project
+
+To debug the involved components, the [VS Code workspace](node-json-theia.code-workspace) offers launch configs, available in the `Run and Debug` view (Ctrl + Shift + D). They are listed in the next section.
+
+In order to develop GLSP server component, the following running procedure has been identified as the best:
+
+1. Run glsp-server compilation in watch mode (`yarn watch` from glsp-server directory)
+2. Run both Theia backend and GLSP server using "Launch TaskList Theia backed with external GLSP Server" launch config
+3. Open [localhost:3000](http://localhost:3000) in Chrome browser
+4. Whenever you want to see new changes propagated to the running instance:
+   1. Close GLSP client (a tab with GLSP diagrams in Theia running application)
+   2. Reload GLSP server process from Call Stack panel in VSCode <img alt="🔃 icon" src="glsp-server/images/Relaunch_GLSP_server.png" height="25px">
+   3. Reload Theia client by reloading the browser tab
+
+### Launch configuration
+
 Here you can choose between four different launch configurations:
 
 - `Launch TaskList GLSP Server`<br>
