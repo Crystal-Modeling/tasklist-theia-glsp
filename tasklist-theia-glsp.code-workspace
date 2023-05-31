@@ -5,10 +5,6 @@
         },
         {
             "path": "glsp-server"
-        },
-        {
-            "name": "tasklist-theia-glsp",
-            "path": "."
         }
     ],
     "settings": {
