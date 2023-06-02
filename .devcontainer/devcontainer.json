@@ -5,7 +5,7 @@
 	},
 	"forwardPorts": [
 		"localhost:3000",
-		"localhost:8080"
+		"localhost:8443"
 	],
 	"portsAttributes": {
 		"3000": {
@@ -16,7 +16,7 @@
 			"label": "GLSP Server",
 			"onAutoForward": "ignore"
 		},
-		"8080": {
+		"8443": {
 			"label": "Langium Model Server",
 			"onAutoForward": "ignore"
 		}
