@@ -8,7 +8,7 @@ import {
 } from '@eclipse-glsp/server-node';
 import { inject, injectable } from 'inversify';
 import { TaskListLmsClient } from '../lms/client/tasklist-lms-client';
-import * as src from '../lms/model';
+import * as lms from '../lms/model';
 import { TaskList } from './tasklist-model';
 import { TaskListModelState } from './tasklist-model-state';
 
@@ -21,24 +21,25 @@ export class TaskListStorage extends AbstractJsonModelStorage {
     protected override modelState: TaskListModelState;
 
     public override async loadSourceModel(action: RequestModelAction): Promise<void> {
+        // TODO: This is in fact should be changed to `getNotationsUri()`
         const sourceUri = this.getSourceUri(action);
         const notations = await this.loadNotationsFromFile(sourceUri, TaskList.is);
-        const sourceModel = await this.lmsClient.getModelById(notations.id);
-        const sModel = this.reconcileNotationsWithSourceModel(notations, sourceModel);
-        // After reconciliation, it is essential to save SModel -- it can get changed after reconciliation
-        this.writeFile(sourceUri, sModel);
-        this.modelState.taskList = sModel;
+        const lmsModel = await this.lmsClient.getModelById(notations.id);
+        const sourceModel = this.reconcileNotationsWithLmsModel(notations, lmsModel);
+        // After reconciliation, it is essential to save SModel -- it can get changed
+        this.writeFile(sourceUri, sourceModel);
+        this.modelState.taskList = sourceModel;
     }
 
     /*
      * Copied and adapted from @eclipse-glsp abstract-json-model-storage
      */
-    private async loadNotationsFromFile<T>(sourceUri: string, guard: TypeGuard<T>): Promise<T> {
+    private async loadNotationsFromFile<T>(notationsUri: string, guard: TypeGuard<T>): Promise<T> {
         try {
-            const notationPath = this.toPath(sourceUri);
+            const notationPath = this.toPath(notationsUri);
             let fileContent = this.readFile(notationPath);
             if (!fileContent) {
-                const modelId = await this.lmsClient.getModelId(sourceUri);
+                const modelId = await this.lmsClient.getModelId(notationsUri);
                 fileContent = this.createModelForEmptyFile(modelId);
             }
             if (!guard(fileContent)) {
@@ -46,27 +47,28 @@ export class TaskListStorage extends AbstractJsonModelStorage {
             }
             return fileContent;
         } catch (error) {
-            throw new GLSPServerError(`Could not load model from file: ${sourceUri}`, error);
+            throw new GLSPServerError(`Could not load model from file: ${notationsUri}`, error);
         }
     }
 
-    private reconcileNotationsWithSourceModel(notations: TaskList, sourceModel: src.Model): TaskList {
+    // NOTE: Consider putting notations reconciliation logic into a separate component
+    private reconcileNotationsWithLmsModel(notations: TaskList, lmsModel: lms.Model): TaskList {
         const reconciledSModel: TaskList = TaskList.create(notations.id);
-        const unmappedTasksById: Map<string, src.Task> = new Map();
-        sourceModel.tasks.forEach(t => unmappedTasksById.set(t.id, t));
+        const unmappedLmsTasksById: Map<string, lms.Task> = new Map();
+        lmsModel.tasks.forEach(t => unmappedLmsTasksById.set(t.id, t));
         for (const nTask of notations.tasks) {
-            const sourceTask = unmappedTasksById.get(nTask.id);
-            if (sourceTask) {
-                unmappedTasksById.delete(nTask.id);
-                reconciledSModel.tasks.push({ ...sourceTask, position: nTask.position, size: nTask.size });
+            const lmsTask = unmappedLmsTasksById.get(nTask.id);
+            if (lmsTask) {
+                unmappedLmsTasksById.delete(nTask.id);
+                reconciledSModel.tasks.push({ ...lmsTask, position: nTask.position, size: nTask.size });
             }
         }
-        for (const sourceTask of unmappedTasksById.values()) {
-            reconciledSModel.tasks.push({ ...sourceTask, position: { x: 0, y: 0 } });
+        for (const lmsTask of unmappedLmsTasksById.values()) {
+            reconciledSModel.tasks.push({ ...lmsTask, position: { x: 0, y: 0 } });
         }
 
-        for (const sourceTransition of sourceModel.transitions) {
-            reconciledSModel.transitions.push({ ...sourceTransition });
+        for (const lmsTransition of lmsModel.transitions) {
+            reconciledSModel.transitions.push({ ...lmsTransition });
         }
         return reconciledSModel;
     }

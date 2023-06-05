@@ -15,16 +15,16 @@ export class TaskListLmsClient {
 
     private lmsSession: http2.ClientHttp2Session | undefined;
 
-    public async getModelId(sourcePath: string): Promise<string> {
+    public async getModelId(notationsPath: string): Promise<string> {
         // HACK: Yet another... This endpoint should be temporal: now I manually tweak notation sourcePath to turn it into a URI
-        const sourceUri = 'file://' + sourcePath;
-        this.logger.info(`!!!! REQUESTING MODEL ID FOR '${sourceUri}' ....`);
+        const notationsUri = 'file://' + notationsPath;
+        this.logger.info(`!!!! REQUESTING MODEL ID FOR '${notationsUri}' ....`);
         if (!this.lmsSession) {
             this.lmsSession = this.createLmsSession();
         }
 
         const { HTTP2_HEADER_PATH } = http2.constants;
-        const request = this.lmsSession.request({ [HTTP2_HEADER_PATH]: `/models/id/${sourceUri}` });
+        const request = this.lmsSession.request({ [HTTP2_HEADER_PATH]: `/models/id/${notationsUri}` });
         request.setEncoding('utf8');
 
         const data = await this.getResponseAsString(request);
