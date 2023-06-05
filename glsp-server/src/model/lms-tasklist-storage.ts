@@ -55,10 +55,7 @@ export class TaskListStorage extends AbstractJsonModelStorage {
     }
 
     protected override createModelForEmptyFile(modelId: string): TaskList {
-        return {
-            id: modelId,
-            tasks: [],
-            transitions: []
-        };
+        return TaskList.create(modelId);
+    }
     }
 }

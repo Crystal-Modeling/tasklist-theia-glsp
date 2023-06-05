@@ -1,3 +1,5 @@
+import { AnyObject, hasStringProp } from '@eclipse-glsp/server-node';
+
 export interface Task {
     id: string;
     name: string;
@@ -5,7 +7,7 @@ export interface Task {
 }
 
 export namespace Task {
-    export function is(obj: any): obj is Task {
-        return typeof obj.id === 'string' && typeof obj.name === 'string' && typeof obj.content === 'string';
+    export function is(obj: unknown): obj is Task {
+        return AnyObject.is(obj) && hasStringProp(obj, 'id') && hasStringProp(obj, 'name') && hasStringProp(obj, 'content');
     }
 }

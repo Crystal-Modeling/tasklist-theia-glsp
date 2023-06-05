@@ -1,3 +1,5 @@
+import { AnyObject, hasStringProp } from '@eclipse-glsp/server-node';
+
 export interface Transition {
     id: string;
     sourceTaskId: string;
@@ -5,7 +7,7 @@ export interface Transition {
 }
 
 export namespace Transition {
-    export function is(obj: any): obj is Transition {
-        return typeof obj.id === 'string' && typeof obj.sourceTaskId === 'string' && typeof obj.targetTaskId === 'string';
+    export function is(obj: unknown): obj is Transition {
+        return AnyObject.is(obj) && hasStringProp(obj, 'id') && hasStringProp(obj, 'sourceTaskId') && hasStringProp(obj, 'targetTaskId');
     }
 }
