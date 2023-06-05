@@ -70,7 +70,8 @@
             "dbaeumer.vscode-eslint",
             "esbenp.prettier-vscode",
             "davidanson.vscode-markdownlint",
-            "eamodio.gitlens"
+            "eamodio.gitlens",
+            "gruntfuggly.todo-tree"
         ]
     },
     "launch": {
