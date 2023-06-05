@@ -9,7 +9,10 @@
     "source.fixAll.eslint": true,
     "source.organizeImports": true
   },
-  "eslint.validate": ["javascript", "typescript"],
+  "eslint.validate": [
+    "javascript",
+    "typescript"
+  ],
   "prettier.prettierPath": "node_modules/prettier",
   "search.exclude": {
     "**/node_modules": true,
@@ -41,6 +44,8 @@
   "[yaml]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
+  "typescript.preferences.quoteStyle": "single",
+  "typescript.format.semicolons": "insert",
   "markdownlint.config": {
     "MD007": {
       "indent": 4

@@ -27,21 +27,36 @@ export interface TaskList {
 }
 
 export namespace TaskList {
-    export function is(object: any): object is TaskList {
+    export function is(object: unknown): object is TaskList {
         return AnyObject.is(object) && hasStringProp(object, 'id') && hasArrayProp(object, 'tasks');
+    }
+
+    export function create(semanticId: string): TaskList {
+        return {
+            id: semanticId,
+            tasks: [],
+            transitions: []
+        };
     }
 }
 
 export interface Task {
     id: string;
     name: string;
+    content: string;
     position: { x: number; y: number };
     size?: { width: number; height: number };
 }
 
 export namespace Task {
-    export function is(object: any): object is Task {
-        return AnyObject.is(object) && hasStringProp(object, 'id') && hasStringProp(object, 'name') && hasObjectProp(object, 'position');
+    export function is(object: unknown): object is Task {
+        return (
+            AnyObject.is(object) &&
+            hasStringProp(object, 'id') &&
+            hasStringProp(object, 'name') &&
+            hasStringProp(object, 'content') &&
+            hasObjectProp(object, 'position')
+        );
     }
 }
 
@@ -52,7 +67,7 @@ export interface Transition {
 }
 
 export namespace Transition {
-    export function is(object: any): object is Transition {
+    export function is(object: unknown): object is Transition {
         return (
             AnyObject.is(object) &&
             hasStringProp(object, 'id') &&

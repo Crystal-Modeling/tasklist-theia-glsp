@@ -26,23 +26,36 @@ import {
     OperationHandlerConstructor,
     SourceModelStorage
 } from '@eclipse-glsp/server-node';
-import { BindingTarget } from '@eclipse-glsp/server-node/lib/di/binding-target';
-import { injectable } from 'inversify';
+import { BindingTarget, applyBindingTarget } from '@eclipse-glsp/server-node/lib/di/binding-target';
+import { injectable, interfaces } from 'inversify';
 import { CreateTaskHandler } from '../handler/create-task-node-handler';
 import { CreateTransitionHandler } from '../handler/create-transition-handler';
 import { DeleteElementHandler } from '../handler/delete-element-handler';
 import { TaskListApplyLabelEditHandler } from '../handler/tasklist-apply-label-edit-handler';
 import { TaskListChangeBoundsHandler } from '../handler/tasklist-change-bounds-handler';
 import { TaskListLabelEditValidator } from '../handler/tasklist-label-edit-validator';
+import { TaskListLmsClient } from '../lms/client/tasklist-lms-client';
+import { TaskListStorage } from '../model/lms-tasklist-storage';
 import { TaskListGModelFactory } from '../model/tasklist-gmodel-factory';
 import { TaskListModelIndex } from '../model/tasklist-model-index';
 import { TaskListModelState } from '../model/tasklist-model-state';
-import { TaskListStorage } from '../model/tasklist-storage';
 import { TaskListDiagramConfiguration } from './tasklist-diagram-configuration';
 
 @injectable()
 export class TaskListDiagramModule extends DiagramModule {
     readonly diagramType = 'tasklist-diagram';
+
+    protected override configure(
+        bind: interfaces.Bind,
+        unbind: interfaces.Unbind,
+        isBound: interfaces.IsBound,
+        rebind: interfaces.Rebind
+    ): void {
+        super.configure(bind, unbind, isBound, rebind);
+        const context = { bind, isBound };
+        // NOTE: Apply LMS specific bindings
+        applyBindingTarget(context, TaskListLmsClient, TaskListLmsClient).inSingletonScope();
+    }
 
     protected bindDiagramConfiguration(): BindingTarget<DiagramConfiguration> {
         return TaskListDiagramConfiguration;

@@ -4,5 +4,13 @@ module.exports = {
     parserOptions: {
         tsconfigRootDir: __dirname,
         project: 'tsconfig.json'
-    }
+    },
+    overrides: [
+        {
+            files: ['lms-*', '**/lms/**', '**/notation/**'],
+            rules: {
+                'header/header': 'off'
+            }
+        }
+    ]
 };

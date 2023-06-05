@@ -3,6 +3,7 @@
 *.log
 
 ## Web ##
+node_modules
 *.log
 
 **/*-browser-app/**

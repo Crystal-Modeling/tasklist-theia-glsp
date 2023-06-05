@@ -38,6 +38,7 @@ export class CreateTaskHandler extends CreateNodeOperationHandler {
         return {
             id: uuid.v4(),
             name: `NewTaskNode${nodeCounter}`,
+            content: 'Lorem Ipsum',
             position
         };
     }
