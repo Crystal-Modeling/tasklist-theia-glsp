@@ -1,5 +1,92 @@
 {
   "id": "a5b691ce-5902-4d5f-bb6f-7ec31f9ad595",
-  "tasks": [],
-  "transitions": []
+  "tasks": [
+    {
+      "id": "d0a9b619-ff20-4d7b-87cc-9fecbc91aabb",
+      "name": "1st",
+      "content": "First task",
+      "position": {
+        "x": 155.26822788729396,
+        "y": 34
+      },
+      "size": {
+        "width": 56.06452941894531,
+        "height": 22.5
+      }
+    },
+    {
+      "id": "e175d896-6e1c-4968-b0a9-a84e2a9ce987",
+      "name": "2nd",
+      "content": "Second task",
+      "position": {
+        "x": 378,
+        "y": 80
+      },
+      "size": {
+        "width": 71.49215698242188,
+        "height": 22.5
+      }
+    },
+    {
+      "id": "772fd006-b571-491e-811d-bf25a025d2d0",
+      "name": "an",
+      "content": "Another task",
+      "position": {
+        "x": 175,
+        "y": 119
+      },
+      "size": {
+        "width": 59.628753662109375,
+        "height": 22.5
+      }
+    },
+    {
+      "id": "eda7afe3-2919-4dc8-991b-d259ab940ff6",
+      "name": "4th",
+      "content": "Call it a day! :)",
+      "position": {
+        "x": 624.2262814761611,
+        "y": 142.87153777139335
+      },
+      "size": {
+        "width": 66.14842224121094,
+        "height": 22.5
+      }
+    },
+    {
+      "id": "46eec84f-c375-4aa0-9773-3c5dda60fc55",
+      "name": "5",
+      "content": "And if another one added?..",
+      "position": {
+        "x": 327,
+        "y": 293
+      },
+      "size": {
+        "width": 16,
+        "height": 22
+      }
+    }
+  ],
+  "transitions": [
+    {
+      "id": "6afc30a0-baf7-4709-bd3c-bc8ca39f398f",
+      "sourceTaskId": "d0a9b619-ff20-4d7b-87cc-9fecbc91aabb",
+      "targetTaskId": "e175d896-6e1c-4968-b0a9-a84e2a9ce987"
+    },
+    {
+      "id": "69db5fca-31fd-4185-8b3b-d27acca3bb29",
+      "sourceTaskId": "e175d896-6e1c-4968-b0a9-a84e2a9ce987",
+      "targetTaskId": "772fd006-b571-491e-811d-bf25a025d2d0"
+    },
+    {
+      "id": "e6794ef4-4e71-4202-8c77-072166bc1439",
+      "sourceTaskId": "772fd006-b571-491e-811d-bf25a025d2d0",
+      "targetTaskId": "eda7afe3-2919-4dc8-991b-d259ab940ff6"
+    },
+    {
+      "id": "a78cba80-6ab9-4097-9753-2eb27b2ad385",
+      "sourceTaskId": "eda7afe3-2919-4dc8-991b-d259ab940ff6",
+      "targetTaskId": "46eec84f-c375-4aa0-9773-3c5dda60fc55"
+    }
+  ]
 }
