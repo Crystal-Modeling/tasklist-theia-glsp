@@ -7,7 +7,7 @@ module.exports = {
     },
     overrides: [
         {
-            files: ['lms-*', '**/lms/**'],
+            files: ['lms-*', '**/lms/**', '**/notation/**'],
             rules: {
                 'header/header': 'off'
             }

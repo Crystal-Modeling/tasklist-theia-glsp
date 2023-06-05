@@ -9,6 +9,7 @@ import {
 import { inject, injectable } from 'inversify';
 import { TaskListLmsClient } from '../lms/client/tasklist-lms-client';
 import * as lms from '../lms/model';
+import * as notation from '../notation/model';
 import { TaskList } from './tasklist-model';
 import { TaskListModelState } from './tasklist-model-state';
 
@@ -22,12 +23,12 @@ export class TaskListStorage extends AbstractJsonModelStorage {
 
     public override async loadSourceModel(action: RequestModelAction): Promise<void> {
         // TODO: This is in fact should be changed to `getNotationsUri()`
-        const sourceUri = this.getSourceUri(action);
-        const notations = await this.loadNotationsFromFile(sourceUri, TaskList.is);
+        const notationUri = this.getSourceUri(action);
+        const notations = await this.loadNotationsFromFile(notationUri, notation.TaskList.is);
         const lmsModel = await this.lmsClient.getModelById(notations.id);
-        const sourceModel = this.reconcileNotationsWithLmsModel(notations, lmsModel);
-        // After reconciliation, it is essential to save SModel -- it can get changed
-        this.writeFile(sourceUri, sourceModel);
+        const sourceModel = this.combineNotationsWithLmsModel(notations, lmsModel);
+        // NOTE: After combination, it is essential to save round-tripped Notation -- it can get changed
+        this.writeFile(notationUri, this.convertSModelToNotations(sourceModel));
         this.modelState.taskList = sourceModel;
     }
 
@@ -51,8 +52,8 @@ export class TaskListStorage extends AbstractJsonModelStorage {
         }
     }
 
-    // NOTE: Consider putting notations reconciliation logic into a separate component
-    private reconcileNotationsWithLmsModel(notations: TaskList, lmsModel: lms.Model): TaskList {
+    // NOTE: Consider putting combination logic into a separate component
+    private combineNotationsWithLmsModel(notations: notation.TaskList, lmsModel: lms.Model): TaskList {
         const reconciledSModel: TaskList = TaskList.create(notations.id);
         const unmappedLmsTasksById: Map<string, lms.Task> = new Map();
         lmsModel.tasks.forEach(t => unmappedLmsTasksById.set(t.id, t));
@@ -73,12 +74,21 @@ export class TaskListStorage extends AbstractJsonModelStorage {
         return reconciledSModel;
     }
 
+    private convertSModelToNotations(sModel: TaskList): notation.TaskList {
+        const notations = notation.TaskList.create(sModel.id);
+        for (const sTask of sModel.tasks) {
+            notations.tasks.push({ id: sTask.id, position: sTask.position, size: sTask.size });
+        }
+        return notations;
+    }
+
     protected override createModelForEmptyFile(modelId: string): TaskList {
         return TaskList.create(modelId);
     }
 
     public override saveSourceModel(action: SaveModelAction): MaybePromise<void> {
         const sourceUri = this.getFileUri(action);
-        this.writeFile(sourceUri, this.modelState.taskList);
+        // NOTE: Since so far no change is propagated to LMS, only Notation needs to be saved
+        this.writeFile(sourceUri, this.convertSModelToNotations(this.modelState.taskList));
     }
 }
