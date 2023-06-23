@@ -4,7 +4,7 @@ import * as http2 from 'http2';
 import { inject, injectable } from 'inversify';
 import * as path from 'path';
 import { promisify } from 'util';
-import { Model } from '../model';
+import { Model, ModelUpdate } from '../model';
 import { LmsClientError } from './error';
 import { ModelIdResponse } from './id-response';
 
@@ -45,7 +45,7 @@ export class TaskListLmsClient {
         return this.convertResponseToJson(data, Model.is);
     }
 
-    public subscribeToModelChanges(id: string, modelUpdateHandler: (update: object) => void): void {
+    public subscribeToModelChanges(id: string, modelUpdateHandler: (update: ModelUpdate) => void): void {
         this.logger.info('!!!! SUBSCRIBING TO MODEL BY ID', id);
         if (!this.lmsSession) {
             this.lmsSession = this.createLmsSession();
@@ -58,7 +58,10 @@ export class TaskListLmsClient {
         });
         request.setEncoding('utf8');
 
-        request.on('data', modelUpdateHandler);
+        request.once('data', response => {
+            console.debug('Got response from subscriptions endpoint', response);
+            request.on('data', updateStr => modelUpdateHandler(this.convertResponseToJson(updateStr, ModelUpdate.is)));
+        });
         request.end();
         request.once('end', () => {
             console.debug('The subscription to LMS model with id', id, 'is ended');
