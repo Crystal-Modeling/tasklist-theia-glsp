@@ -45,6 +45,26 @@ export class TaskListLmsClient {
         return this.convertResponseToJson(data, Model.is);
     }
 
+    public subscribeToModelChanges(id: string, modelUpdateHandler: (update: object) => void): void {
+        this.logger.info('!!!! SUBSCRIBING TO MODEL BY ID', id);
+        if (!this.lmsSession) {
+            this.lmsSession = this.createLmsSession();
+        }
+
+        const { HTTP2_HEADER_PATH, HTTP2_HEADER_METHOD } = http2.constants;
+        const request = this.lmsSession.request({
+            [HTTP2_HEADER_PATH]: `/models/${id}/subscriptions`,
+            [HTTP2_HEADER_METHOD]: 'POST'
+        });
+        request.setEncoding('utf8');
+
+        request.on('data', modelUpdateHandler);
+        request.end();
+        request.once('end', () => {
+            console.debug('The subscription to LMS model with id', id, 'is ended');
+        });
+    }
+
     private createLmsSession(): http2.ClientHttp2Session {
         // TODO: Get rid of hardcoded CA certificate
         const certificateAuthority = fs.readFileSync(path.join(__dirname, '../../lms-ssl/cert.pem'));

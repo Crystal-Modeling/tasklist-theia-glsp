@@ -30,6 +30,11 @@ export class TaskListStorage extends AbstractJsonModelStorage {
         // NOTE: After combination, it is essential to save round-tripped Notation -- it can get changed
         this.writeFile(notationUri, this.convertSModelToNotations(sourceModel));
         this.modelState.taskList = sourceModel;
+
+        // Subscribing to the source model changes
+        this.lmsClient.subscribeToModelChanges(notations.id, update => {
+            console.debug('Received an update from the server', update);
+        });
     }
 
     /*
