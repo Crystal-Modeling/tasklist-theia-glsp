@@ -5,6 +5,7 @@ import { inject, injectable } from 'inversify';
 import * as path from 'path';
 import { promisify } from 'util';
 import { Model, ModelUpdate } from '../model';
+import { RenameUpdate } from '../model/updates';
 import { LmsClientError } from './error';
 import { ModelIdResponse } from './id-response';
 
@@ -45,7 +46,11 @@ export class TaskListLmsClient {
         return this.convertResponseToJson(data, Model.is);
     }
 
-    public subscribeToModelChanges(id: string, modelUpdateHandler: (update: ModelUpdate) => void): void {
+    public subscribeToModelChanges(
+        id: string,
+        modelUpdateHandler: (update: ModelUpdate) => void,
+        renameHandler: (rename: RenameUpdate) => void
+    ): void {
         this.logger.info('!!!! SUBSCRIBING TO MODEL BY ID', id);
         if (!this.lmsSession) {
             this.lmsSession = this.createLmsSession();
@@ -60,7 +65,16 @@ export class TaskListLmsClient {
 
         request.once('data', response => {
             console.debug('Got response from subscriptions endpoint', response);
-            request.on('data', updateStr => modelUpdateHandler(this.convertResponseToJson(updateStr, ModelUpdate.is)));
+            request.on('data', updateStr => {
+                const update = this.parseResponse(updateStr);
+                if (RenameUpdate.is(update)) {
+                    renameHandler(update);
+                } else if (ModelUpdate.is(update)) {
+                    modelUpdateHandler(update);
+                } else {
+                    throw new LmsClientError("Response received from LMS doesn't comply to expected format");
+                }
+            });
         });
         request.end();
         request.once('end', () => {
@@ -91,11 +105,15 @@ export class TaskListLmsClient {
     }
 
     private convertResponseToJson<T>(responseData: string, guard: TypeGuard<T>): T {
-        this.logger.info('!!!! RECEIVED RESPONSE FROM LMS !!!! "' + responseData + '"');
-        const response = JSON.parse(responseData);
+        const response = this.parseResponse(responseData);
         if (guard(response)) {
             return response;
         }
         throw new LmsClientError("Response received from LMS doesn't comply to expected format");
+    }
+
+    private parseResponse(responseData: string): object {
+        this.logger.info('!!!! RECEIVED RESPONSE FROM LMS !!!! "' + responseData + '"');
+        return JSON.parse(responseData);
     }
 }

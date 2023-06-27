@@ -1,2 +1,2 @@
-task theFirst "Success?" -> theSecond
-task theSecond "Feels rather weird"
+task theFirst "Success?" -> the2Nd
+task the2Nd "Feels rather weird"

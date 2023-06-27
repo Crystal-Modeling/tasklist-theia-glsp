@@ -22,3 +22,15 @@ export interface ArrayUpdate<T> {
     removedIds?: string[];
     changed?: Array<ElementUpdate<T>>;
 }
+
+export interface RenameUpdate {
+    id: string;
+    name: string;
+    __state: 'RENAMED';
+}
+
+export namespace RenameUpdate {
+    export function is(obj: unknown): obj is RenameUpdate {
+        return AnyObject.is(obj) && hasStringProp(obj, 'name') && obj.__state === 'RENAMED';
+    }
+}

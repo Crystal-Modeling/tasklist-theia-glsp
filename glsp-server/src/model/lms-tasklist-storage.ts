@@ -40,11 +40,22 @@ export class TaskListStorage extends AbstractJsonModelStorage {
         this.modelState.taskList = sourceModel;
 
         // Subscribing to the source model changes
-        this.lmsClient.subscribeToModelChanges(notations.id, update => {
-            console.debug('Received an update from the server', update);
-            this.modelState.taskList = this.combineLmsUpdateWithSourceModel(update, sourceModel);
-            this.actionDispatcher.dispatchAll(this.submissionHandler.submitModel());
-        });
+        this.lmsClient.subscribeToModelChanges(
+            notations.id,
+            update => {
+                console.debug('Received an update from the server', update);
+                this.modelState.taskList = this.combineLmsUpdateWithSourceModel(update, sourceModel);
+                this.actionDispatcher.dispatchAll(this.submissionHandler.submitModel());
+            },
+            rename => {
+                console.debug('Received a rename from the server', rename);
+                this.modelState.taskList = this.combineLmsUpdateWithSourceModel(
+                    { id: notations.id, tasks: { changed: [{ id: rename.id, name: rename.name }] } },
+                    sourceModel
+                );
+                this.actionDispatcher.dispatchAll(this.submissionHandler.submitModel());
+            }
+        );
     }
 
     /*
