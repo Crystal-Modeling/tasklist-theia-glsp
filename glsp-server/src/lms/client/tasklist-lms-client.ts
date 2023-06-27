@@ -4,7 +4,7 @@ import * as http2 from 'http2';
 import { inject, injectable } from 'inversify';
 import * as path from 'path';
 import { promisify } from 'util';
-import { Model } from '../model';
+import { Model, ModelUpdate } from '../model';
 import { LmsClientError } from './error';
 import { ModelIdResponse } from './id-response';
 
@@ -43,6 +43,29 @@ export class TaskListLmsClient {
 
         const data = await this.getResponseAsString(request);
         return this.convertResponseToJson(data, Model.is);
+    }
+
+    public subscribeToModelChanges(id: string, modelUpdateHandler: (update: ModelUpdate) => void): void {
+        this.logger.info('!!!! SUBSCRIBING TO MODEL BY ID', id);
+        if (!this.lmsSession) {
+            this.lmsSession = this.createLmsSession();
+        }
+
+        const { HTTP2_HEADER_PATH, HTTP2_HEADER_METHOD } = http2.constants;
+        const request = this.lmsSession.request({
+            [HTTP2_HEADER_PATH]: `/models/${id}/subscriptions`,
+            [HTTP2_HEADER_METHOD]: 'POST'
+        });
+        request.setEncoding('utf8');
+
+        request.once('data', response => {
+            console.debug('Got response from subscriptions endpoint', response);
+            request.on('data', updateStr => modelUpdateHandler(this.convertResponseToJson(updateStr, ModelUpdate.is)));
+        });
+        request.end();
+        request.once('end', () => {
+            console.debug('The subscription to LMS model with id', id, 'is ended');
+        });
     }
 
     private createLmsSession(): http2.ClientHttp2Session {

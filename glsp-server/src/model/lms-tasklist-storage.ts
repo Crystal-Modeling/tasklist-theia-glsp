@@ -1,7 +1,9 @@
 import {
     AbstractJsonModelStorage,
+    ActionDispatcher,
     GLSPServerError,
     MaybePromise,
+    ModelSubmissionHandler,
     RequestModelAction,
     SaveModelAction,
     TypeGuard
@@ -21,6 +23,12 @@ export class TaskListStorage extends AbstractJsonModelStorage {
     @inject(TaskListModelState)
     protected override modelState: TaskListModelState;
 
+    @inject(ModelSubmissionHandler)
+    protected submissionHandler: ModelSubmissionHandler;
+
+    @inject(ActionDispatcher)
+    protected actionDispatcher: ActionDispatcher;
+
     public override async loadSourceModel(action: RequestModelAction): Promise<void> {
         // TODO: This is in fact should be changed to `getNotationsUri()`
         const notationUri = this.getSourceUri(action);
@@ -30,6 +38,13 @@ export class TaskListStorage extends AbstractJsonModelStorage {
         // NOTE: After combination, it is essential to save round-tripped Notation -- it can get changed
         this.writeFile(notationUri, this.convertSModelToNotations(sourceModel));
         this.modelState.taskList = sourceModel;
+
+        // Subscribing to the source model changes
+        this.lmsClient.subscribeToModelChanges(notations.id, update => {
+            console.debug('Received an update from the server', update);
+            this.modelState.taskList = this.combineLmsUpdateWithSourceModel(update, sourceModel);
+            this.actionDispatcher.dispatchAll(this.submissionHandler.submitModel());
+        });
     }
 
     /*
@@ -72,6 +87,53 @@ export class TaskListStorage extends AbstractJsonModelStorage {
             reconciledSModel.transitions.push({ ...lmsTransition });
         }
         return reconciledSModel;
+    }
+
+    private combineLmsUpdateWithSourceModel(update: lms.ModelUpdate, sourceModel: TaskList): TaskList {
+        if (update.tasks) {
+            console.debug('Updating tasks');
+            if (update.tasks.removedIds) {
+                const idsToRemove = new Set(update.tasks.removedIds);
+                console.debug('Going to remove', update.tasks.removedIds);
+                sourceModel.tasks = sourceModel.tasks.filter(t => !idsToRemove.has(t.id));
+                console.debug('Tasks after removal', sourceModel.tasks);
+            }
+            for (const newTask of update.tasks.added ?? []) {
+                sourceModel.tasks.push({ ...newTask, position: { x: 0, y: 0 } });
+            }
+            for (const taskUpdate of update.tasks.changed ?? []) {
+                const sTask = sourceModel.tasks.find(t => t.id === taskUpdate.id);
+                if (sTask) {
+                    if (taskUpdate.content) {
+                        sTask.content = taskUpdate.content;
+                    }
+                    if (taskUpdate.name) {
+                        sTask.name = taskUpdate.name;
+                    }
+                }
+            }
+        }
+        if (update.transitions) {
+            if (update.transitions.removedIds) {
+                const idsToRemove = new Set(update.transitions.removedIds);
+                sourceModel.transitions = sourceModel.transitions.filter(t => !idsToRemove.has(t.id));
+            }
+            for (const newTransition of update.transitions.added ?? []) {
+                sourceModel.transitions.push({ ...newTransition });
+            }
+            for (const transitionUpdate of update.transitions.changed ?? []) {
+                const sTask = sourceModel.transitions.find(t => t.id === transitionUpdate.id);
+                if (sTask) {
+                    if (transitionUpdate.sourceTaskId) {
+                        sTask.sourceTaskId = transitionUpdate.sourceTaskId;
+                    }
+                    if (transitionUpdate.targetTaskId) {
+                        sTask.targetTaskId = transitionUpdate.targetTaskId;
+                    }
+                }
+            }
+        }
+        return sourceModel;
     }
 
     private convertSModelToNotations(sModel: TaskList): notation.TaskList {
