@@ -13,6 +13,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
+import { configureELKLayoutModule } from '@eclipse-glsp/layout-elk';
 import {
     createAppModule,
     createSocketCliParser,
@@ -23,6 +24,7 @@ import {
 } from '@eclipse-glsp/server-node';
 import { Container } from 'inversify';
 import { TaskListDiagramModule } from './diagram/tasklist-diagram-module';
+import { TaskListLayoutConfigurator } from './handler/lms-tasklist-layout-configurator';
 
 export function launch(argv?: string[]): void {
     const options = createSocketCliParser().parse(argv);
@@ -31,7 +33,9 @@ export function launch(argv?: string[]): void {
 
     const logger = appContainer.get<LoggerFactory>(LoggerFactory)('TaskListServerApp');
     const launcher = appContainer.resolve(SocketServerLauncher);
-    const serverModule = new ServerModule().configureDiagramModule(new TaskListDiagramModule());
+    const elkLayoutModule = configureELKLayoutModule({ algorithms: ['layered'], layoutConfigurator: TaskListLayoutConfigurator });
+    console.log('Binding LayoutEngine through ELKLayoutModule!', elkLayoutModule);
+    const serverModule = new ServerModule().configureDiagramModule(new TaskListDiagramModule(), elkLayoutModule);
 
     const errorHandler = (error: any): void => logger.error('Error in workflow server launcher:', error);
     launcher.configure(serverModule);

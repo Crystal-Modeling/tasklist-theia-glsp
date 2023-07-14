@@ -34,6 +34,7 @@ import { DeleteElementHandler } from '../handler/delete-element-handler';
 import { TaskListApplyLabelEditHandler } from '../handler/tasklist-apply-label-edit-handler';
 import { TaskListChangeBoundsHandler } from '../handler/tasklist-change-bounds-handler';
 import { TaskListLabelEditValidator } from '../handler/tasklist-label-edit-validator';
+import { TaskListLayoutOperationHandler } from '../layout/lms-tasklist-layout-operation-handler';
 import { TaskListLmsClient } from '../lms/client/tasklist-lms-client';
 import { TaskListStorage } from '../model/lms-tasklist-storage';
 import { TaskListGModelFactory } from '../model/tasklist-gmodel-factory';
@@ -80,6 +81,9 @@ export class TaskListDiagramModule extends DiagramModule {
 
     protected override configureOperationHandlers(binding: InstanceMultiBinding<OperationHandlerConstructor>): void {
         super.configureOperationHandlers(binding);
+        // NOTE: LayoutOperationHandler handler is already bound in newer versions of DiagramModule (e.g., 1.1.0-next)
+        binding.add(TaskListLayoutOperationHandler);
+        // binding.add(LayoutOperationHandler);
         binding.add(CreateTaskHandler);
         binding.add(CreateTransitionHandler);
         binding.add(TaskListChangeBoundsHandler);

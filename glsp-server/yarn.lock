@@ -61,6 +61,16 @@
   dependencies:
     "@eclipse-glsp/protocol" "1.0.0"
 
+"@eclipse-glsp/layout-elk@^1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@eclipse-glsp/layout-elk/-/layout-elk-1.0.0.tgz#0db90d469e874c8f53791dcd6e8a53aad3dc56db"
+  integrity sha512-9Nv9YQSW03QRYYL7hCMKIIOCbftEktrpWJpKTAUO8cRDzCefi/jYzfgkh/0ejgJGx70qJjo37CNjoJswRKhIfA==
+  dependencies:
+    "@eclipse-glsp/server-node" "^1.0.0"
+    elkjs "^0.7.1"
+    inversify "^5.1.1"
+    sprotty-elk "0.12.0"
+
 "@eclipse-glsp/mocha-config@1.1.0-next.d03ad9f.112+d03ad9f":
   version "1.1.0-next.d03ad9f.112"
   resolved "https://registry.yarnpkg.com/@eclipse-glsp/mocha-config/-/mocha-config-1.1.0-next.d03ad9f.112.tgz#cd4046f9bce5b6a72bb3d3b6e7ec00514aac94d0"
@@ -1035,6 +1045,11 @@ electron-to-chromium@^1.4.251:
   resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.4.284.tgz#61046d1e4cab3a25238f6bf7413795270f125592"
   integrity sha512-M8WEXFuKXMYMVr45fo8mq0wUrrJHheiKZf6BArTKk9ZBYCKJEOU5H8cdWgDT+qCVZf7Na4lVUaZsA+h6uA9+PA==
 
+elkjs@^0.7.1:
+  version "0.7.1"
+  resolved "https://registry.yarnpkg.com/elkjs/-/elkjs-0.7.1.tgz#4751c5e918a4988139baf7f214e010aea22de969"
+  integrity sha512-lD86RWdh480/UuRoHhRcnv2IMkIcK6yMDEuT8TPBIbO3db4HfnVF+1lgYdQi99Ck0yb+lg5Eb46JCHI5uOsmAw==
+
 emoji-regex@^8.0.0:
   version "8.0.0"
   resolved "https://registry.yarnpkg.com/emoji-regex/-/emoji-regex-8.0.0.tgz#e818fd69ce5ccfcb404594f842963bf53164cc37"
@@ -1673,7 +1688,7 @@ interpret@^2.2.0:
   resolved "https://registry.yarnpkg.com/interpret/-/interpret-2.2.0.tgz#1a78a0b5965c40a5416d007ad6f50ad27c417df9"
   integrity sha512-Ju0Bz/cEia55xDwUWEa8+olFpCiQoypjnQySseKtmjNrnps3P+xfpUmGr90T7yjlVJmOtybRvPXhKMbHr+fWnw==
 
-inversify@5.1.1:
+inversify@5.1.1, inversify@^5.1.1:
   version "5.1.1"
   resolved "https://registry.yarnpkg.com/inversify/-/inversify-5.1.1.tgz#6fbd668c591337404e005a1946bfe0d802c08730"
   integrity sha512-j8grHGDzv1v+8T1sAQ+3boTCntFPfvxLCkNcxB1J8qA0lUN+fAlSyYd+RXKvaPRL4AGyPxViutBEJHNXOyUdFQ==
@@ -2588,7 +2603,17 @@ source-map@^0.6.0:
   resolved "https://registry.yarnpkg.com/source-map/-/source-map-0.6.1.tgz#74722af32e9614e9c287a8d0bbde48b5e2f1a263"
   integrity sha512-UjgapumWlbMhkBgzT7Ykc5YXUT46F0iKu8SGXq0bcwP5dz/h0Plj6enJqjz1Zbq2l5WaqYnrVbwWOWMyF3F47g==
 
-sprotty-protocol@0.12.0:
+sprotty-elk@0.12.0:
+  version "0.12.0"
+  resolved "https://registry.yarnpkg.com/sprotty-elk/-/sprotty-elk-0.12.0.tgz#2f2a164d1637209026954848217b6c717285e513"
+  integrity sha512-7mrQRiG3mSo4+oQLd9huM8FEW18e4ZwA3rt+dtVj9yHDcVfjWGSraLmWBu3qc4lia94X1sR2UcecURzxQQxKgg==
+  dependencies:
+    elkjs "^0.7.1"
+    sprotty-protocol "~0.12.0"
+  optionalDependencies:
+    inversify "^5.1.1"
+
+sprotty-protocol@0.12.0, sprotty-protocol@~0.12.0:
   version "0.12.0"
   resolved "https://registry.yarnpkg.com/sprotty-protocol/-/sprotty-protocol-0.12.0.tgz#542eb6396a645f85f8cfc2e7ef1d9b90c7b1980b"
   integrity sha512-vbov+XfbmSeMYb46vm6dJvK3q7YKUvg0q7JnM6H7Ca5qY8TaZCEZ5Vc8zHKFZGWchcwnQYKqLTzwDItsMikD0A==

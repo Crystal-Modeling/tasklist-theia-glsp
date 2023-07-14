@@ -1,2 +1,4 @@
 task theFirst "Success?" -> the2Nd
-task the2Nd "Feels rather weird"
+task the2Nd "Feels rather weird" -> the3rd
+task the3rd "More tasks!" -> andAgain
+task andAgain "Mooore tasks!!!"
