@@ -34,7 +34,6 @@ export function launch(argv?: string[]): void {
     const logger = appContainer.get<LoggerFactory>(LoggerFactory)('TaskListServerApp');
     const launcher = appContainer.resolve(SocketServerLauncher);
     const elkLayoutModule = configureELKLayoutModule({ algorithms: ['layered'], layoutConfigurator: TaskListLayoutConfigurator });
-    console.log('Binding LayoutEngine through ELKLayoutModule!', elkLayoutModule);
     const serverModule = new ServerModule().configureDiagramModule(new TaskListDiagramModule(), elkLayoutModule);
 
     const errorHandler = (error: any): void => logger.error('Error in workflow server launcher:', error);

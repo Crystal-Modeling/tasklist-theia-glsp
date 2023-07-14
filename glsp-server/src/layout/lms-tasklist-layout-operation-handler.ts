@@ -3,7 +3,6 @@ import {
     DefaultTypes,
     DiagramConfiguration,
     GBoundsAware,
-    GGraph,
     GModelElement,
     GModelRoot,
     LayoutEngine,
@@ -45,15 +44,7 @@ export class TaskListLayoutOperationHandler implements OperationHandler {
         if (operation.kind === LayoutOperation.KIND) {
             if (this.diagramConfiguration.layoutKind === ServerLayoutKind.MANUAL) {
                 if (this.layoutEngine) {
-                    const root = this.modelState.root;
-                    if (!(root instanceof GGraph)) {
-                        this.logger.warn('The root that is going to be layouted is not an instance of GGraph');
-                    } else {
-                        this.logger.info('OK ✅: The root is instance of GGraph');
-                    }
-                    this.logger.info('GModel root before layouting', decirclingGModelElement(root));
                     const newGModel = await this.layoutEngine.layout();
-                    this.logger.info('GModel AFTER layouting', decirclingGModelElement(newGModel));
                     this.applyBounds(newGModel);
                     this.actionDispatcher.dispatchAll(this.submissionHandler.submitModelDirectly());
                 } else {
@@ -72,8 +63,4 @@ export class TaskListLayoutOperationHandler implements OperationHandler {
                 element.size = nodeBounds.size;
             });
     }
-}
-
-function decirclingGModelElement(root: GModelElement): object {
-    return { ...root, cssClasses: undefined, parent: undefined, root: undefined, children: root.children.map(decirclingGModelElement) };
 }
