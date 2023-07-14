@@ -13,7 +13,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
-import { GModelIndex } from '@eclipse-glsp/server-node';
+import { GModelIndex, TypeGuard, getOrThrow } from '@eclipse-glsp/server-node';
 import { injectable } from 'inversify';
 import { Task, TaskList, Transition } from './tasklist-model';
 
@@ -28,17 +28,29 @@ export class TaskListModelIndex extends GModelIndex {
         }
     }
 
+    /**
+     * Returns an optional TaskList SourceModel element by its id.
+     *
+     * @param elementId The id of the requested TaskList source model element.
+     */
+    getSModel<T extends Task | Transition>(elementId: string, typeGuard: TypeGuard<T>): T {
+        return getOrThrow(this.findSModel(elementId, typeGuard), `Could not retrieve SModel element with id: '${elementId}'`);
+    }
+
     findTask(id: string): Task | undefined {
-        const element = this.findTaskOrTransition(id);
-        return Task.is(element) ? element : undefined;
+        return this.findSModel(id, Task.is);
     }
 
     findTransition(id: string): Transition | undefined {
-        const element = this.findTaskOrTransition(id);
-        return Transition.is(element) ? element : undefined;
+        return this.findSModel(id, Transition.is);
     }
 
     findTaskOrTransition(id: string): Task | Transition | undefined {
         return this.idToTaskListElements.get(id);
+    }
+
+    private findSModel<T extends Task | Transition>(id: string, typeGuard: TypeGuard<T>): T | undefined {
+        const element = this.findTaskOrTransition(id);
+        return typeGuard(element) ? element : undefined;
     }
 }
