@@ -11,11 +11,11 @@
     },
     {
       "id": "476c380f-1a1f-4cf0-b06e-e728c5573c04",
-      "name": "the3rd"
+      "name": "3rd"
     },
     {
-      "id": "094f4912-26dd-4ef8-b077-d47fc887656a",
-      "name": "andAgain"
+      "id": "f0dd8752-eed6-4072-aa78-12f1541b0e89",
+      "name": "the4th"
     }
   ],
   "transitions": [
@@ -30,9 +30,9 @@
       "targetTaskId": "476c380f-1a1f-4cf0-b06e-e728c5573c04"
     },
     {
-      "id": "2c52ec7b-8766-499a-a968-6ab20cf9d5fe",
+      "id": "132e9861-81d9-420b-9d1c-2dbae05cce87",
       "sourceTaskId": "476c380f-1a1f-4cf0-b06e-e728c5573c04",
-      "targetTaskId": "094f4912-26dd-4ef8-b077-d47fc887656a"
+      "targetTaskId": "f0dd8752-eed6-4072-aa78-12f1541b0e89"
     }
   ]
 }

@@ -2,6 +2,7 @@ import {
     AbstractJsonModelStorage,
     ActionDispatcher,
     GLSPServerError,
+    LayoutOperation,
     MaybePromise,
     ModelSubmissionHandler,
     RequestModelAction,
@@ -46,6 +47,7 @@ export class TaskListStorage extends AbstractJsonModelStorage {
                 console.debug('Received an update from the server', update);
                 this.modelState.taskList = this.combineLmsUpdateWithSourceModel(update, sourceModel);
                 this.actionDispatcher.dispatchAll(this.submissionHandler.submitModel());
+                this.actionDispatcher.dispatchAfterNextUpdate(LayoutOperation.create([sourceModel.id]));
             },
             rename => {
                 console.debug('Received a rename from the server', rename);
@@ -54,6 +56,7 @@ export class TaskListStorage extends AbstractJsonModelStorage {
                     sourceModel
                 );
                 this.actionDispatcher.dispatchAll(this.submissionHandler.submitModel());
+                this.actionDispatcher.dispatchAfterNextUpdate(LayoutOperation.create([rename.id]));
             }
         );
     }

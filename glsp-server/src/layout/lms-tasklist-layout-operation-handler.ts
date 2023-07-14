@@ -1,18 +1,15 @@
 import {
     ActionDispatcher,
-    DefaultTypes,
     DiagramConfiguration,
-    GBoundsAware,
-    GModelElement,
     GModelRoot,
+    GNode,
     LayoutEngine,
     LayoutOperation,
     Logger,
     ModelSubmissionHandler,
     Operation,
     OperationHandler,
-    ServerLayoutKind,
-    isGBoundsAware
+    ServerLayoutKind
 } from '@eclipse-glsp/server-node';
 import { inject, injectable, optional } from 'inversify';
 import { Task } from '../model/tasklist-model';
@@ -56,11 +53,11 @@ export class TaskListLayoutOperationHandler implements OperationHandler {
 
     protected applyBounds(root: GModelRoot): void {
         root.children
-            .filter((node): node is GModelElement & GBoundsAware => node.type === DefaultTypes.NODE && isGBoundsAware(node))
-            .forEach(nodeBounds => {
-                const element = this.modelState.index.getSModel(nodeBounds.id, Task.is);
-                element.position = nodeBounds.position ?? element.position;
-                element.size = nodeBounds.size;
+            .filter((node): node is GNode => node instanceof GNode)
+            .forEach(gNode => {
+                const element = this.modelState.index.getSModel(gNode.id, Task.is);
+                element.position = gNode.position ?? element.position;
+                element.size = gNode.size;
             });
     }
 }
