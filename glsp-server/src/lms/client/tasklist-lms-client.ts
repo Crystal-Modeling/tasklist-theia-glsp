@@ -5,7 +5,7 @@ import { inject, injectable } from 'inversify';
 import * as path from 'path';
 import { promisify } from 'util';
 import { Model, ModelUpdate } from '../model';
-import { RenameUpdate } from '../model/updates';
+import { HighlightUpdate, RenameUpdate } from '../model/updates';
 import { LmsClientError } from './error';
 import { ModelIdResponse } from './id-response';
 
@@ -49,7 +49,8 @@ export class TaskListLmsClient {
     public subscribeToModelChanges(
         id: string,
         modelUpdateHandler: (update: ModelUpdate) => void,
-        renameHandler: (rename: RenameUpdate) => void
+        renameHandler: (rename: RenameUpdate) => void,
+        highlightHandler: (highlight: HighlightUpdate) => void
     ): void {
         this.logger.info('!!!! SUBSCRIBING TO MODEL BY ID', id);
         if (!this.lmsSession) {
@@ -67,7 +68,9 @@ export class TaskListLmsClient {
             console.debug('Got response from subscriptions endpoint', response);
             request.on('data', updateStr => {
                 const update = this.parseResponse(updateStr);
-                if (RenameUpdate.is(update)) {
+                if (HighlightUpdate.is(update)) {
+                    highlightHandler(update);
+                } else if (RenameUpdate.is(update)) {
                     renameHandler(update);
                 } else if (ModelUpdate.is(update)) {
                     modelUpdateHandler(update);

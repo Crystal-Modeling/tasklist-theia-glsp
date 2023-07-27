@@ -1,6 +1,7 @@
 import {
     AbstractJsonModelStorage,
     ActionDispatcher,
+    CenterAction,
     GLSPServerError,
     LayoutOperation,
     MaybePromise,
@@ -57,6 +58,9 @@ export class TaskListStorage extends AbstractJsonModelStorage {
                 );
                 this.actionDispatcher.dispatchAll(this.submissionHandler.submitModel());
                 this.actionDispatcher.dispatchAfterNextUpdate(LayoutOperation.create([rename.id]));
+            },
+            highlight => {
+                this.actionDispatcher.dispatch(CenterAction.create([highlight.id]));
             }
         );
     }
