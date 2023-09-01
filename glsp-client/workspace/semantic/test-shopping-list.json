@@ -1,0 +1,74 @@
+{
+  "id": "ed1f85d5-7cd0-44a2-a49f-7a1b9bd718c5",
+  "tasks": [
+    {
+      "id": "7bd8bf5f-9c94-4745-bf91-f4a59d57f7fe",
+      "name": "1"
+    },
+    {
+      "id": "72d52e0b-fb4e-48ae-8d41-8e252b1dcd93",
+      "name": "2"
+    },
+    {
+      "id": "f1ef74c1-9c8a-45cb-a033-8aca49677528",
+      "name": "3"
+    },
+    {
+      "id": "1c526bbf-e9df-4b74-9e49-857ebdab8b08",
+      "name": "milk"
+    },
+    {
+      "id": "d86ca028-92d2-4235-9691-f04c90ffee87",
+      "name": "curdCheese"
+    },
+    {
+      "id": "da5bbd55-92ec-414c-a0c7-0e122d7dbffc",
+      "name": "sourCream"
+    },
+    {
+      "id": "11b538b9-6e68-49bb-8e65-866cc4e8376f",
+      "name": "4"
+    },
+    {
+      "id": "7d0bb223-bbe4-4647-a599-ad30c33de9d8",
+      "name": "potato"
+    }
+  ],
+  "transitions": [
+    {
+      "id": "218a28c3-337a-45fb-8cdc-49272d376703",
+      "sourceTaskId": "7bd8bf5f-9c94-4745-bf91-f4a59d57f7fe",
+      "targetTaskId": "72d52e0b-fb4e-48ae-8d41-8e252b1dcd93"
+    },
+    {
+      "id": "82bc49a0-2982-4f06-b1ff-5a5019adf993",
+      "sourceTaskId": "72d52e0b-fb4e-48ae-8d41-8e252b1dcd93",
+      "targetTaskId": "f1ef74c1-9c8a-45cb-a033-8aca49677528"
+    },
+    {
+      "id": "87926c74-1b2b-4326-b359-6c1e677de08e",
+      "sourceTaskId": "f1ef74c1-9c8a-45cb-a033-8aca49677528",
+      "targetTaskId": "1c526bbf-e9df-4b74-9e49-857ebdab8b08"
+    },
+    {
+      "id": "b29ff9a0-28bd-4ca8-8e82-d69449eb97fd",
+      "sourceTaskId": "f1ef74c1-9c8a-45cb-a033-8aca49677528",
+      "targetTaskId": "d86ca028-92d2-4235-9691-f04c90ffee87"
+    },
+    {
+      "id": "71814a33-551b-4d3a-b63f-c07bccc33389",
+      "sourceTaskId": "f1ef74c1-9c8a-45cb-a033-8aca49677528",
+      "targetTaskId": "da5bbd55-92ec-414c-a0c7-0e122d7dbffc"
+    },
+    {
+      "id": "73a4bd76-f1b7-4f46-9626-e4d3201b2668",
+      "sourceTaskId": "f1ef74c1-9c8a-45cb-a033-8aca49677528",
+      "targetTaskId": "11b538b9-6e68-49bb-8e65-866cc4e8376f"
+    },
+    {
+      "id": "8d9d6256-b0e8-413d-b8c9-9936ab4e1c10",
+      "sourceTaskId": "11b538b9-6e68-49bb-8e65-866cc4e8376f",
+      "targetTaskId": "7d0bb223-bbe4-4647-a599-ad30c33de9d8"
+    }
+  ]
+}
