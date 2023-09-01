@@ -6,7 +6,8 @@ import { injectable } from 'inversify';
 export class TaskListLayoutConfigurator extends AbstractLayoutConfigurator {
     protected override graphOptions(graph: GGraph): LayoutOptions | undefined {
         return {
-            'elk.algorithm': 'layered'
+            'elk.algorithm': 'layered',
+            'elk.direction': 'DOWN'
         };
     }
 }

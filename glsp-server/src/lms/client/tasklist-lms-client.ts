@@ -33,7 +33,7 @@ export class TaskListLmsClient {
     }
 
     public async getModelById(id: string): Promise<Model> {
-        this.logger.info('!!!! REQUESTING MODEL FROM LMS ....');
+        this.logger.info('!!!! REQUESTING MODEL FROM LMS. ID = ', id);
         if (!this.lmsSession) {
             this.lmsSession = this.createLmsSession();
         }
