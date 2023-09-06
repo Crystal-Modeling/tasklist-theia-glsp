@@ -2,7 +2,8 @@ import { AnyObject, hasStringProp } from '@eclipse-glsp/server-node';
 import { isArray } from '../utils/type-utils';
 import { Task } from './task';
 import { Transition } from './transition';
-import { ArrayUpdate } from './updates';
+import { ArrayUpdate, RootUpdate } from './updates';
+import { ModelUri } from './uri';
 
 export interface Model {
     id: string;
@@ -16,14 +17,13 @@ export namespace Model {
     }
 }
 
-export interface ModelUpdate {
-    id: string;
+export interface ModelUpdate extends RootUpdate {
     tasks?: ArrayUpdate<Task>;
     transitions?: ArrayUpdate<Transition>;
 }
 
 export namespace ModelUpdate {
-    export function is(obj: unknown): obj is ModelUpdate {
-        return AnyObject.is(obj) && hasStringProp(obj, 'id');
+    export function is(obj: RootUpdate): obj is ModelUpdate {
+        return obj.modelUri === ModelUri.root;
     }
 }
