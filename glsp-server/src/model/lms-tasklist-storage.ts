@@ -13,6 +13,7 @@ import {
 import { inject, injectable } from 'inversify';
 import { TaskListLmsClient } from '../lms/client/tasklist-lms-client';
 import * as lms from '../lms/model';
+import { Highlight, Save } from '../lms/model/actions';
 import * as notation from '../notation/model';
 import { TaskList } from './tasklist-model';
 import { TaskListModelState } from './tasklist-model-state';
@@ -31,9 +32,9 @@ export class TaskListStorage extends AbstractJsonModelStorage {
     @inject(ActionDispatcher)
     protected actionDispatcher: ActionDispatcher;
 
-    public override async loadSourceModel(action: RequestModelAction): Promise<void> {
+    public override async loadSourceModel(requestModelAction: RequestModelAction): Promise<void> {
         // TODO: This is in fact should be changed to `getNotationsUri()`
-        const notationUri = this.getSourceUri(action);
+        const notationUri = this.getSourceUri(requestModelAction);
         const notations = await this.loadNotationsFromFile(notationUri, notation.TaskList.is);
         const lmsModel = await this.lmsClient.getModelById(notations.id);
         const sourceModel = this.combineNotationsWithLmsModel(notations, lmsModel);
@@ -50,8 +51,15 @@ export class TaskListStorage extends AbstractJsonModelStorage {
                 this.actionDispatcher.dispatchAll(this.submissionHandler.submitModel());
                 this.actionDispatcher.dispatchAfterNextUpdate(LayoutOperation.create([sourceModel.id]));
             },
-            highlight => {
-                this.actionDispatcher.dispatch(CenterAction.create([highlight.id]));
+            action => {
+                if (Highlight.is(action)) {
+                    this.actionDispatcher.dispatch(CenterAction.create([action.id]));
+                } else if (Save.is(action)) {
+                    console.debug('Saving Model...');
+                    this.actionDispatcher.dispatch(SaveModelAction.create());
+                } else {
+                    console.warn('Unknown action received', action);
+                }
             }
         );
     }

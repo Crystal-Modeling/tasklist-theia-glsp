@@ -33,14 +33,3 @@ export namespace ElementUpdate {
         return AnyObject.is(obj) && hasStringProp(obj, 'id');
     }
 }
-
-export interface HighlightUpdate {
-    id: string;
-    __state: 'HIGHLIGHTED';
-}
-
-export namespace HighlightUpdate {
-    export function is(obj: unknown): obj is HighlightUpdate {
-        return AnyObject.is(obj) && obj.__state === 'HIGHLIGHTED';
-    }
-}
