@@ -142,11 +142,18 @@ export class TaskListStorage extends AbstractJsonModelStorage {
     private applyTaskUpdateToSourceModel(taskUpdate: lms.ElementUpdate<lms.Task>, sourceModel: TaskList): void {
         const sTask = sourceModel.tasks.find(t => t.id === taskUpdate.id);
         if (sTask) {
+            let modified = false;
             if (taskUpdate.content) {
                 sTask.content = taskUpdate.content;
+                modified = true;
             }
             if (taskUpdate.name) {
                 sTask.name = taskUpdate.name;
+                modified = true;
+            }
+            if (modified) {
+                // NOTE: Updating the SourceTask GNode size to the default one to microlayout it automatically
+                sTask.size = undefined;
             }
         }
     }
