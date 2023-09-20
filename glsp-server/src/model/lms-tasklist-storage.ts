@@ -56,6 +56,8 @@ export class TaskListStorage extends AbstractJsonModelStorage {
                     this.actionDispatcher.dispatch(CenterAction.create([action.id]));
                 } else if (Save.is(action)) {
                     console.debug('Saving Model...');
+                    // FIXME: When Save action is pushed together with ModelUpdate (i.e., deleting models marked for deletion),
+                    // then notation is modified *after* it is saved with auto-layout
                     this.actionDispatcher.dispatch(SaveModelAction.create());
                 } else {
                     console.warn('Unknown action received', action);

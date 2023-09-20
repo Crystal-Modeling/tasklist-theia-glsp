@@ -1,8 +1,8 @@
-task 1 "Oranges" -> 2
-task 2 "Lemons" -> 3
-task 3 "Diary" -> milk, curdCheese, sourCream, 4
+task 1 "1. Oranges" -> 2
+task 2 "2. Lemons" -> 3
+task 3 "3. Diary" -> 4, milk, curdCheese, sourCream
 task milk "Milk (Full cream, filtered)"
 task curdCheese "Curd cheese (see eu shop)"
 task sourCream "Sour cream (check Tesco)"
-task 4 "Vegetables" -> potato
+task 4 "4. Vegetables" -> potato
 task potato "Potato"

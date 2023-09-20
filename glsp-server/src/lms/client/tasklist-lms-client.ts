@@ -26,7 +26,7 @@ export class TaskListLmsClient {
         }
 
         const { HTTP2_HEADER_PATH } = http2.constants;
-        const request = this.lmsSession.request({ [HTTP2_HEADER_PATH]: `/models/id/${notationsUri}` });
+        const request = this.lmsSession.request({ [HTTP2_HEADER_PATH]: `/models/id?uri=${notationsUri}`});
         request.setEncoding('utf8');
 
         const data = await this.getResponseAsString(request);
