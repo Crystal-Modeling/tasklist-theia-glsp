@@ -83,6 +83,22 @@ export class TaskListLmsClient {
         });
     }
 
+    public async highlight(rootId: string, modelId: string): Promise<void> {
+        this.logger.info('!!!! Highlighting the MODEL BY ROOT ID', rootId, 'and MODEL ID', modelId);
+        if (!this.lmsSession) {
+            this.lmsSession = this.createLmsSession();
+        }
+
+        const { HTTP2_HEADER_PATH, HTTP2_HEADER_METHOD } = http2.constants;
+        const request = this.lmsSession.request({
+            [HTTP2_HEADER_PATH]: `/models/${rootId}/highlight/${modelId}`,
+            [HTTP2_HEADER_METHOD]: 'PUT'
+        });
+        request.setEncoding('utf8');
+
+        return this.getResponse(request);
+    }
+
     private createLmsSession(): http2.ClientHttp2Session {
         // TODO: Get rid of hardcoded CA certificate
         const certificateAuthority = fs.readFileSync(path.join(__dirname, '../../lms-ssl/cert.pem'));
@@ -103,6 +119,11 @@ export class TaskListLmsClient {
         request.end();
         await promisify(request.once.bind(request))('end');
         return data;
+    }
+
+    private async getResponse(request: http2.ClientHttp2Stream): Promise<void> {
+        request.end();
+        await promisify(request.once.bind(request))('end');
     }
 
     private convertResponseToJson<T>(responseData: string, guard: TypeGuard<T>): T {
