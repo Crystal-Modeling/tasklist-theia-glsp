@@ -26,7 +26,7 @@ export class TaskListLmsClient {
         }
 
         const { HTTP2_HEADER_PATH } = http2.constants;
-        const request = this.lmsSession.request({ [HTTP2_HEADER_PATH]: `/models/id?uri=${notationsUri}`});
+        const request = this.lmsSession.request({ [HTTP2_HEADER_PATH]: `/models/id?uri=${notationsUri}` });
         request.setEncoding('utf8');
 
         const data = await this.getResponseAsString(request);
@@ -92,6 +92,22 @@ export class TaskListLmsClient {
         const { HTTP2_HEADER_PATH, HTTP2_HEADER_METHOD } = http2.constants;
         const request = this.lmsSession.request({
             [HTTP2_HEADER_PATH]: `/models/${rootId}/highlight/${modelId}`,
+            [HTTP2_HEADER_METHOD]: 'PUT'
+        });
+        request.setEncoding('utf8');
+
+        return this.getResponse(request);
+    }
+
+    public async persist(rootId: string): Promise<void> {
+        this.logger.debug('Persisting Source model', rootId);
+        if (!this.lmsSession) {
+            this.lmsSession = this.createLmsSession();
+        }
+
+        const { HTTP2_HEADER_PATH, HTTP2_HEADER_METHOD } = http2.constants;
+        const request = this.lmsSession.request({
+            [HTTP2_HEADER_PATH]: `/models/${rootId}/persist`,
             [HTTP2_HEADER_METHOD]: 'PUT'
         });
         request.setEncoding('utf8');

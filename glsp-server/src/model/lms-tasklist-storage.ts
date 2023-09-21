@@ -194,7 +194,9 @@ export class TaskListStorage extends AbstractJsonModelStorage {
 
     public override saveSourceModel(action: SaveModelAction): MaybePromise<void> {
         const sourceUri = this.getFileUri(action);
-        // NOTE: Since so far no change is propagated to LMS, only Notation needs to be saved
+        // NOTE: 1. Persisting notation locally
         this.writeFile(sourceUri, this.convertSModelToNotations(this.modelState.taskList));
+        // NOTE: 2. Persisting source model remotely on LMS
+        return this.lmsClient.persist(this.modelState.taskList.id);
     }
 }
