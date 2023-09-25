@@ -7,10 +7,10 @@ import {
     MaybePromise,
     ModelSubmissionHandler,
     RequestModelAction,
-    SaveModelAction,
     TypeGuard
 } from '@eclipse-glsp/server-node';
 import { inject, injectable } from 'inversify';
+import { LmsSaveModelAction } from '../lms/action-protocol/model-saving';
 import { TaskListLmsClient } from '../lms/client/tasklist-lms-client';
 import * as lms from '../lms/model';
 import { Highlight, Save } from '../lms/model/actions';
@@ -58,7 +58,7 @@ export class TaskListStorage extends AbstractJsonModelStorage {
                     console.debug('Saving Model...');
                     // FIXME: When Save action is pushed together with ModelUpdate (i.e., deleting models marked for deletion),
                     // then notation is modified *after* it is saved with auto-layout
-                    this.actionDispatcher.dispatch(SaveModelAction.create());
+                    this.actionDispatcher.dispatch(LmsSaveModelAction.create({ ignoreSourceModel: true }));
                 } else {
                     console.warn('Unknown action received', action);
                 }
@@ -192,11 +192,13 @@ export class TaskListStorage extends AbstractJsonModelStorage {
         return TaskList.create(modelId);
     }
 
-    public override saveSourceModel(action: SaveModelAction): MaybePromise<void> {
+    public override saveSourceModel(action: LmsSaveModelAction): MaybePromise<void> {
         const sourceUri = this.getFileUri(action);
         // NOTE: 1. Persisting notation locally
         this.writeFile(sourceUri, this.convertSModelToNotations(this.modelState.taskList));
-        // NOTE: 2. Persisting source model remotely on LMS
-        return this.lmsClient.persist(this.modelState.taskList.id);
+        if (!action.ignoreSourceModel) {
+            // NOTE: 2. Persisting source model remotely on LMS
+            return this.lmsClient.persist(this.modelState.taskList.id);
+        }
     }
 }
