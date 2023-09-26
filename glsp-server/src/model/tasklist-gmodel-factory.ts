@@ -37,11 +37,38 @@ export class TaskListGModelFactory implements GModelFactory {
     }
 
     protected createTaskNode(task: Task): GNode {
+        // const name = GNode.builder()
+        //     .layout('hbox')
+        //     .addChildren(
+        //         GNode.builder()
+        //             .addCssClass('tasklist-node')
+        //             .add(
+        //                 GLabel.builder().text(task.name).id(`${task.id}_name`).addCssClass('name').addLayoutOption('hAlign', 'left')
+        //                 .build()
+        //             )
+        //             .build(),
+        //         GNode.builder().addCssClass('transparent-node').build()
+        //     )
+        //     .build();
+
+        // const content = GNode.builder()
+        //     .id(task.id)
+        //     .addCssClass('tasklist-node')
+        //     .add(GLabel.builder().text(task.content).addCssClass('content').build())
+        //     .build();
+
+        // const builder = GNode.builder()
+        //     .addCssClass('transparent-node')
+        //     .layout('vbox')
+        //     .addChildren(name, content)
+        //     .addLayoutOption('paddingLeft', 5)
+        //     .position(task.position);
         const builder = GNode.builder()
             .id(task.id)
             .addCssClass('tasklist-node')
-            .add(GLabel.builder().text(task.content).id(`${task.id}_label`).build())
-            .layout('hbox')
+            .add(GLabel.builder().text(task.name).id(`${task.id}_name`).addCssClass('name').addLayoutOption('hAlign', 'left').build())
+            .add(GLabel.builder().text(task.content).id(`${task.id}_label`).addCssClass('content').build())
+            .layout('vbox')
             .addLayoutOption('paddingLeft', 5)
             .position(task.position);
 
