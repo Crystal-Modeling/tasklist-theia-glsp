@@ -14,6 +14,6 @@ export namespace Task {
     }
 
     export function isUpdate(obj: RootUpdate): obj is RootUpdate & ElementUpdate<Task> {
-        return obj.modelUri.startsWith(ModelUri.nested(ModelUri.Segment.property('tasks')));
+        return obj.modelUri.startsWith(ModelUri.of(ModelUri.Segment.property('tasks')));
     }
 }

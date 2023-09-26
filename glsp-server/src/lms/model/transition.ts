@@ -14,6 +14,6 @@ export namespace Transition {
     }
 
     export function isUpdate(obj: RootUpdate): obj is RootUpdate & ElementUpdate<Transition> {
-        return obj.modelUri.startsWith(ModelUri.nested(ModelUri.Segment.property('transitions')));
+        return obj.modelUri.startsWith(ModelUri.of(ModelUri.Segment.property('transitions')));
     }
 }

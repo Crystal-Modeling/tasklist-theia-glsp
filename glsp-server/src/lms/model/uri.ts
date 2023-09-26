@@ -3,10 +3,10 @@ export interface ModelUri {
 }
 
 export namespace ModelUri {
-    export const root = '.';
+    export const root = '/';
 
-    export function nested(...segments: Segment[]): string {
-        return root + segments.join('');
+    export function of(...segments: Segment[]): string {
+        return segments.join('');
     }
 
     export namespace Segment {
