@@ -46,6 +46,7 @@ export interface Task {
     content: string;
     position: { x: number; y: number };
     size?: { width: number; height: number };
+    hidden?: boolean;
 }
 
 export namespace Task {
@@ -64,6 +65,7 @@ export interface Transition {
     id: string;
     sourceTaskId: string;
     targetTaskId: string;
+    hidden?: boolean;
 }
 
 export namespace Transition {

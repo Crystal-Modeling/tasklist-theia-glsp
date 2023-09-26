@@ -37,32 +37,6 @@ export class TaskListGModelFactory implements GModelFactory {
     }
 
     protected createTaskNode(task: Task): GNode {
-        // const name = GNode.builder()
-        //     .layout('hbox')
-        //     .addChildren(
-        //         GNode.builder()
-        //             .addCssClass('tasklist-node')
-        //             .add(
-        //                 GLabel.builder().text(task.name).id(`${task.id}_name`).addCssClass('name').addLayoutOption('hAlign', 'left')
-        //                 .build()
-        //             )
-        //             .build(),
-        //         GNode.builder().addCssClass('transparent-node').build()
-        //     )
-        //     .build();
-
-        // const content = GNode.builder()
-        //     .id(task.id)
-        //     .addCssClass('tasklist-node')
-        //     .add(GLabel.builder().text(task.content).addCssClass('content').build())
-        //     .build();
-
-        // const builder = GNode.builder()
-        //     .addCssClass('transparent-node')
-        //     .layout('vbox')
-        //     .addChildren(name, content)
-        //     .addLayoutOption('paddingLeft', 5)
-        //     .position(task.position);
         const builder = GNode.builder()
             .id(task.id)
             .addCssClass('tasklist-node')
@@ -75,16 +49,24 @@ export class TaskListGModelFactory implements GModelFactory {
         if (task.size) {
             builder.addLayoutOptions({ prefWidth: task.size.width, prefHeight: task.size.height });
         }
+        if (task.hidden) {
+            builder.addCssClass('hidden');
+        }
 
         return builder.build();
     }
 
     protected createTransitionEdge(transition: Transition): GEdge {
-        return GEdge.builder() //
+        const builder = GEdge.builder()
             .id(transition.id)
             .addCssClass('tasklist-transition')
             .sourceId(transition.sourceTaskId)
-            .targetId(transition.targetTaskId)
-            .build();
+            .targetId(transition.targetTaskId);
+
+        if (transition.hidden) {
+            builder.addCssClass('hidden');
+        }
+
+        return builder.build();
     }
 }

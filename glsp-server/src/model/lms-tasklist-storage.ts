@@ -161,6 +161,9 @@ export class TaskListStorage extends AbstractJsonModelStorage {
                 sTask.name = taskUpdate.name;
                 modified = true;
             }
+            if (taskUpdate.__state) {
+                sTask.hidden = taskUpdate.__state === 'DISAPPEARED';
+            }
             if (modified) {
                 // NOTE: Updating the SourceTask GNode size to the default one to microlayout it automatically
                 sTask.size = undefined;
@@ -176,6 +179,9 @@ export class TaskListStorage extends AbstractJsonModelStorage {
             }
             if (transitionUpdate.targetTaskId) {
                 sTransition.targetTaskId = transitionUpdate.targetTaskId;
+            }
+            if (transitionUpdate.__state) {
+                sTransition.hidden = transitionUpdate.__state === 'DISAPPEARED';
             }
         }
     }
