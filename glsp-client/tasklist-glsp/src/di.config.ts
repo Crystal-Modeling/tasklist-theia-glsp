@@ -22,6 +22,7 @@ import {
     editLabelFeature,
     LogLevel,
     overrideViewerOptions,
+    SEdge,
     SLabel,
     SLabelView,
     TYPES
@@ -29,6 +30,7 @@ import {
 import 'balloon-css/balloon.min.css';
 import { Container, ContainerModule } from 'inversify';
 import '../css/diagram.css';
+import { TaskListEdgeView } from './tasklist-views';
 
 const taskListDiagramModule = new ContainerModule((bind, unbind, isBound, rebind) => {
     rebind(TYPES.ILogger).to(ConsoleLogger).inSingletonScope();
@@ -36,6 +38,7 @@ const taskListDiagramModule = new ContainerModule((bind, unbind, isBound, rebind
     const context = { bind, unbind, isBound, rebind };
     configureDefaultModelElements(context);
     configureModelElement(context, DefaultTypes.LABEL, SLabel, SLabelView, { enable: [editLabelFeature] });
+    configureModelElement(context, DefaultTypes.EDGE, SEdge, TaskListEdgeView);
 });
 
 export default function createContainer(widgetId: string): Container {
