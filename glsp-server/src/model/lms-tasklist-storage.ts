@@ -58,7 +58,7 @@ export class TaskListStorage extends AbstractJsonModelStorage {
                     console.debug('Saving Model...');
                     // FIXME: When Save action is pushed together with ModelUpdate (i.e., deleting models marked for deletion),
                     // then notation is modified *after* it is saved with auto-layout
-                    this.actionDispatcher.dispatch(LmsSaveModelAction.create({ ignoreSourceModel: true }));
+                    this.actionDispatcher.dispatch(LmsSaveModelAction.create({ persistNotation: true }));
                 } else {
                     console.warn('Unknown action received', action);
                 }
@@ -193,12 +193,13 @@ export class TaskListStorage extends AbstractJsonModelStorage {
     }
 
     public override saveSourceModel(action: LmsSaveModelAction): MaybePromise<void> {
-        const sourceUri = this.getFileUri(action);
-        // NOTE: 1. Persisting notation locally
-        this.writeFile(sourceUri, this.convertSModelToNotations(this.modelState.taskList));
-        if (!action.ignoreSourceModel) {
-            // NOTE: 2. Persisting source model remotely on LMS
+        if (!action.persistNotation) {
+            // NOTE: 1. Persisting source model remotely on LMS
             return this.lmsClient.persist(this.modelState.taskList.id);
+        } else {
+            // NOTE: 2. Persisting notation locally
+            const sourceUri = this.getFileUri(action);
+            this.writeFile(sourceUri, this.convertSModelToNotations(this.modelState.taskList));
         }
     }
 }

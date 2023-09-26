@@ -7,11 +7,11 @@ import { SaveModelAction } from '@eclipse-glsp/server-node';
  * and creating new `SaveModelActions`.
  */
 export interface LmsSaveModelAction extends SaveModelAction {
-    ignoreSourceModel?: boolean;
+    persistNotation?: boolean;
 }
 
 export namespace LmsSaveModelAction {
-    export function create(lmsOptions: { ignoreSourceModel: boolean }, options: { fileUri?: string } = {}): LmsSaveModelAction {
+    export function create(lmsOptions: { persistNotation: boolean }, options: { fileUri?: string } = {}): LmsSaveModelAction {
         return Object.assign(SaveModelAction.create(options), lmsOptions);
     }
 }
