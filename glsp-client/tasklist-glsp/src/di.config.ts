@@ -19,6 +19,8 @@ import {
     ConsoleLogger,
     createClientContainer,
     DefaultTypes,
+    Dimension,
+    EditableLabel,
     editLabelFeature,
     LogLevel,
     overrideViewerOptions,
@@ -37,6 +39,7 @@ const taskListDiagramModule = new ContainerModule((bind, unbind, isBound, rebind
     rebind(TYPES.LogLevel).toConstantValue(LogLevel.warn);
     const context = { bind, unbind, isBound, rebind };
     configureDefaultModelElements(context);
+    configureModelElement(context, 'label:long', SLongLabel, SLabelView, { enable: [editLabelFeature] });
     configureModelElement(context, DefaultTypes.LABEL, SLabel, SLabelView, { enable: [editLabelFeature] });
     configureModelElement(context, DefaultTypes.EDGE, SEdge, TaskListEdgeView);
 });
@@ -51,4 +54,8 @@ export default function createContainer(widgetId: string): Container {
     });
 
     return container;
+}
+
+class SLongLabel extends SLabel implements EditableLabel {
+    editControlDimension: Dimension = { width: 250, height: 20 };
 }

@@ -14,7 +14,7 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 import { ApplyLabelEditOperation } from '@eclipse-glsp/protocol';
-import { GLSPServerError, GNode, OperationHandler, toTypeGuard } from '@eclipse-glsp/server-node';
+import { GLSPServerError, OperationHandler } from '@eclipse-glsp/server-node';
 import { inject, injectable } from 'inversify';
 import { TaskListModelState } from '../model/tasklist-model-state';
 
@@ -27,14 +27,19 @@ export class TaskListApplyLabelEditHandler implements OperationHandler {
 
     execute(operation: ApplyLabelEditOperation): void {
         const index = this.modelState.index;
-        // Retrieve the parent node of the label that should be edited
-        const taskNode = index.findParentElement(operation.labelId, toTypeGuard(GNode));
-        if (taskNode) {
-            const task = index.findTask(taskNode.id);
-            if (!task) {
-                throw new GLSPServerError(`Could not retrieve the parent task for the label with id ${operation.labelId}`);
-            }
-            task.name = operation.text;
+        console.debug('Applying Label edit. Operation:', operation);
+        const [taskId, propertyName] = operation.labelId.split('_', 2);
+        const task = index.findTask(taskId);
+        if (!task) {
+            throw new GLSPServerError(`Could not retrieve the parent task for the label with id ${operation.labelId}`);
+        }
+        switch (propertyName) {
+            case 'name':
+            case 'content':
+                task[propertyName] = operation.text;
+                break;
+            default:
+                console.warn(`Unable to update task: property ${propertyName} is unknown`);
         }
     }
 }

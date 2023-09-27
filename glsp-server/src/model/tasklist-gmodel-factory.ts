@@ -42,11 +42,14 @@ export class TaskListGModelFactory implements GModelFactory {
             .addCssClass('tasklist-node')
             .addChildren(
                 GLabel.builder() //
+                    .id(task.id + '_name')
                     .text(task.name)
                     .addCssClass('name')
                     .addLayoutOption('hAlign', 'left')
                     .build(),
                 GLabel.builder() //
+                    .id(task.id + '_content')
+                    .type('label:long')
                     .text(task.content)
                     .addCssClass('content')
                     .build()
