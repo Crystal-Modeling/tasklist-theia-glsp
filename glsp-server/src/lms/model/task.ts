@@ -1,9 +1,9 @@
 import { AnyObject, hasStringProp } from '@eclipse-glsp/server-node';
+import { LmsModel } from './model';
 import { ElementUpdate, RootUpdate } from './updates';
 import { ModelUri } from './uri';
 
-export interface Task {
-    id: string;
+export interface Task extends LmsModel {
     name: string;
     content: string;
 }

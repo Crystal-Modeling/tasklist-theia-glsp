@@ -4,8 +4,9 @@ import * as http2 from 'http2';
 import { inject, injectable } from 'inversify';
 import * as path from 'path';
 import { promisify } from 'util';
-import { Model } from '../model';
+import { Model, Task, Transition } from '../model';
 import { Action } from '../model/actions';
+import { Modification, ModificationResult } from '../model/modifications';
 import { RootUpdate } from '../model/updates';
 import { LmsClientError } from './error';
 import { ModelIdResponse } from './id-response';
@@ -29,8 +30,7 @@ export class TaskListLmsClient {
         const request = this.lmsSession.request({ [HTTP2_HEADER_PATH]: `/models/id?uri=${notationsUri}` });
         request.setEncoding('utf8');
 
-        const data = await this.getResponseAsString(request);
-        return this.convertResponseToJson(data, ModelIdResponse.is).id;
+        return (await this.getResponseObject(request, ModelIdResponse.is)).id;
     }
 
     public async getModelById(id: string): Promise<Model> {
@@ -43,8 +43,7 @@ export class TaskListLmsClient {
         const request = this.lmsSession.request({ [HTTP2_HEADER_PATH]: `/models/${id}` });
         request.setEncoding('utf8');
 
-        const data = await this.getResponseAsString(request);
-        return this.convertResponseToJson(data, Model.is);
+        return this.getResponseObject(request, Model.is);
     }
 
     public subscribeToModelChanges(
@@ -115,6 +114,34 @@ export class TaskListLmsClient {
         return this.getResponse(request);
     }
 
+    public async updateTask(rootId: string, modification: Modification<Task>): Promise<ModificationResult> {
+        return this.update('task', rootId, modification);
+    }
+
+    public async updateTransition(rootId: string, modification: Modification<Transition>): Promise<ModificationResult> {
+        return this.update('transition', rootId, modification);
+    }
+
+    private async update(domain: 'task', rootId: string, modification: Modification<Task>): Promise<ModificationResult>;
+    private async update(domain: 'transition', rootId: string, modification: Modification<Transition>): Promise<ModificationResult>;
+    private async update(domain: string, rootId: string, modification: Modification): Promise<ModificationResult> {
+        this.logger.debug(`Updating ${domain} in '${rootId}' with ID ${modification.id}`);
+
+        if (!this.lmsSession) {
+            this.lmsSession = this.createLmsSession();
+        }
+
+        const { HTTP2_HEADER_PATH, HTTP2_HEADER_METHOD } = http2.constants;
+        const request = this.lmsSession.request({
+            [HTTP2_HEADER_PATH]: `/models/${rootId}/${domain}s/${modification.id}`,
+            [HTTP2_HEADER_METHOD]: 'PUT'
+        });
+        request.setEncoding('utf8');
+        request.write(JSON.stringify(modification), 'utf8');
+
+        return this.getResponseObject(request, ModificationResult.is);
+    }
+
     private createLmsSession(): http2.ClientHttp2Session {
         // TODO: Get rid of hardcoded CA certificate
         const certificateAuthority = fs.readFileSync(path.join(__dirname, '../../lms-ssl/cert.pem'));
@@ -127,6 +154,16 @@ export class TaskListLmsClient {
         return session;
     }
 
+    private async getResponse(request: http2.ClientHttp2Stream): Promise<void> {
+        request.end();
+        await promisify(request.once.bind(request))('end');
+    }
+
+    private async getResponseObject<T>(request: http2.ClientHttp2Stream, guard: TypeGuard<T>): Promise<T> {
+        const data = await this.getResponseAsString(request);
+        return this.convertResponseToJson(data, guard);
+    }
+
     private async getResponseAsString(request: http2.ClientHttp2Stream): Promise<string> {
         let data = '';
         request.on('data', chunk => {
@@ -135,11 +172,6 @@ export class TaskListLmsClient {
         request.end();
         await promisify(request.once.bind(request))('end');
         return data;
-    }
-
-    private async getResponse(request: http2.ClientHttp2Stream): Promise<void> {
-        request.end();
-        await promisify(request.once.bind(request))('end');
     }
 
     private convertResponseToJson<T>(responseData: string, guard: TypeGuard<T>): T {

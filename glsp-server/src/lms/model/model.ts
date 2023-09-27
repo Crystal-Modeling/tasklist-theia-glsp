@@ -5,8 +5,11 @@ import { Transition } from './transition';
 import { ArrayUpdate, RootUpdate } from './updates';
 import { ModelUri } from './uri';
 
-export interface Model {
+export interface LmsModel {
     id: string;
+}
+
+export interface Model extends LmsModel {
     tasks: Task[];
     transitions: Transition[];
 }
