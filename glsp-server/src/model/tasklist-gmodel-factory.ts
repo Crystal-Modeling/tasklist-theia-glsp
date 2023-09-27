@@ -15,7 +15,7 @@
  ********************************************************************************/
 import { GEdge, GGraph, GLabel, GModelFactory, GNode } from '@eclipse-glsp/server-node';
 import { inject, injectable } from 'inversify';
-import { Task, Transition } from './tasklist-model';
+import { Task, Transition, visible } from './tasklist-model';
 import { TaskListModelState } from './tasklist-model-state';
 
 @injectable()
@@ -26,8 +26,8 @@ export class TaskListGModelFactory implements GModelFactory {
     createModel(): void {
         const taskList = this.modelState.taskList;
         this.modelState.index.indexTaskList(taskList);
-        const childNodes = taskList.tasks.map(task => this.createTaskNode(task));
-        const childEdges = taskList.transitions.map(transition => this.createTransitionEdge(transition));
+        const childNodes = visible(taskList.tasks).map(task => this.createTaskNode(task));
+        const childEdges = visible(taskList.transitions).map(transition => this.createTransitionEdge(transition));
         const newRoot = GGraph.builder() //
             .id(taskList.id)
             .addChildren(childNodes)
@@ -37,11 +37,20 @@ export class TaskListGModelFactory implements GModelFactory {
     }
 
     protected createTaskNode(task: Task): GNode {
-        const builder = GNode.builder()
+        const builder = GNode.builder() //
             .id(task.id)
             .addCssClass('tasklist-node')
-            .add(GLabel.builder().text(task.name).id(`${task.id}_name`).addCssClass('name').addLayoutOption('hAlign', 'left').build())
-            .add(GLabel.builder().text(task.content).id(`${task.id}_label`).addCssClass('content').build())
+            .addChildren(
+                GLabel.builder() //
+                    .text(task.name)
+                    .addCssClass('name')
+                    .addLayoutOption('hAlign', 'left')
+                    .build(),
+                GLabel.builder() //
+                    .text(task.content)
+                    .addCssClass('content')
+                    .build()
+            )
             .layout('vbox')
             .addLayoutOption('paddingLeft', 5)
             .position(task.position);
@@ -49,24 +58,16 @@ export class TaskListGModelFactory implements GModelFactory {
         if (task.size) {
             builder.addLayoutOptions({ prefWidth: task.size.width, prefHeight: task.size.height });
         }
-        if (task.hidden) {
-            builder.addCssClass('hidden');
-        }
 
         return builder.build();
     }
 
     protected createTransitionEdge(transition: Transition): GEdge {
-        const builder = GEdge.builder()
+        return GEdge.builder() //
             .id(transition.id)
             .addCssClass('tasklist-transition')
             .sourceId(transition.sourceTaskId)
-            .targetId(transition.targetTaskId);
-
-        if (transition.hidden) {
-            builder.addCssClass('hidden');
-        }
-
-        return builder.build();
+            .targetId(transition.targetTaskId)
+            .build();
     }
 }

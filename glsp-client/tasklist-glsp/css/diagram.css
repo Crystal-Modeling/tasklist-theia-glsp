@@ -24,17 +24,6 @@ svg {
     fill: inherit;
 }
 
-.tasklist-transition,
-.tasklist-node {
-    opacity: 1;
-    transition: opacity 0.2s;
-}
-
-.tasklist-transition.hidden,
-.tasklist-node.hidden {
-    opacity: 0;
-}
-
 .tasklist-node > .sprotty-node {
     fill: #f1bd6c;
 }

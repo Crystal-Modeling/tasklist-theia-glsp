@@ -40,13 +40,20 @@ export namespace TaskList {
     }
 }
 
-export interface Task {
+export interface SourceElement {
     id: string;
+    hidden?: boolean;
+}
+
+export function visible<T extends SourceElement>(elements: T[]): T[] {
+    return elements.filter(el => !el.hidden);
+}
+
+export interface Task extends SourceElement {
     name: string;
     content: string;
     position: { x: number; y: number };
     size?: { width: number; height: number };
-    hidden?: boolean;
 }
 
 export namespace Task {
@@ -61,11 +68,9 @@ export namespace Task {
     }
 }
 
-export interface Transition {
-    id: string;
+export interface Transition extends SourceElement {
     sourceTaskId: string;
     targetTaskId: string;
-    hidden?: boolean;
 }
 
 export namespace Transition {
