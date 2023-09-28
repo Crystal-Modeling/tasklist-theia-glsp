@@ -15,7 +15,7 @@
     },
     {
       "id": "581ee97e-4bb2-4552-9594-6279a06a4295",
-      "name": "444"
+      "name": "fourth"
     }
   ],
   "transitions": [
@@ -27,7 +27,7 @@
     {
       "id": "c11e0afb-7b75-4d8f-bb51-ac5c296b3cd6",
       "sourceTaskId": "697b6c32-4245-4a42-9484-6e0cc48daf23",
-      "targetTaskId": "581ee97e-4bb2-4552-9594-6279a06a4295"
+      "targetTaskId": "476c380f-1a1f-4cf0-b06e-e728c5573c04"
     },
     {
       "id": "2ae9099b-0c6a-4269-b3ab-632746493b38",

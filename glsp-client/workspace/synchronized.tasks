@@ -1,4 +1,4 @@
 task 1st "Success!" -> second
-task second "Feels rather weird" -> 444
-task 3rd "More tasks!" -> 444
-task 444 "Mooore tasks!!!"
+task second "Feels rather weird" -> 3rd
+task 3rd "More tasks!" -> fourth
+task fourth "Mooore tasks!!!"

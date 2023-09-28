@@ -3,7 +3,6 @@ import {
     ActionDispatcher,
     CenterAction,
     GLSPServerError,
-    LayoutOperation,
     MaybePromise,
     ModelSubmissionHandler,
     RequestModelAction,
@@ -49,7 +48,7 @@ export class TaskListStorage extends AbstractJsonModelStorage {
                 console.debug('Received an update from the server', update);
                 this.modelState.taskList = this.combineLmsUpdateWithSourceModel(update, sourceModel);
                 this.actionDispatcher.dispatchAll(this.submissionHandler.submitModel());
-                this.actionDispatcher.dispatchAfterNextUpdate(LayoutOperation.create([sourceModel.id]));
+                // this.actionDispatcher.dispatchAfterNextUpdate(LayoutOperation.create([sourceModel.id]));
             },
             action => {
                 if (Highlight.is(action)) {
