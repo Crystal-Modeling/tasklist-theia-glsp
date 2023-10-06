@@ -150,6 +150,24 @@ export class TaskListLmsClient {
         return this.delete('transition', rootId, transitionId);
     }
 
+    public async deleteModels(rootId: string, modelIds: string[]): Promise<ModificationResult> {
+        this.logger.debug(`Updating models in '${rootId}' with IDs ${modelIds}`);
+
+        if (!this.lmsSession) {
+            this.lmsSession = this.createLmsSession();
+        }
+
+        const { HTTP2_HEADER_PATH, HTTP2_HEADER_METHOD } = http2.constants;
+        const request = this.lmsSession.request({
+            [HTTP2_HEADER_PATH]: `/models/${rootId}`,
+            [HTTP2_HEADER_METHOD]: 'PUT'
+        });
+        request.setEncoding('utf8');
+        request.write(JSON.stringify(modelIds), 'utf8');
+
+        return this.getResponseObject(request, ModificationResult.is);
+    }
+
     private async delete(domain: 'task', rootId: string, modelId: string): Promise<ModificationResult>;
     private async delete(domain: 'transition', rootId: string, modelId: string): Promise<ModificationResult>;
     private async delete(domain: string, rootId: string, modelId: string): Promise<ModificationResult> {

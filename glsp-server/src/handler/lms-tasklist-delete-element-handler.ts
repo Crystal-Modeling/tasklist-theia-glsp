@@ -9,7 +9,6 @@ import {
 } from '@eclipse-glsp/server-node';
 import { inject, injectable } from 'inversify';
 import { TaskListLmsClient } from '../lms/client/tasklist-lms-client';
-import { Task, Transition } from '../model/tasklist-model';
 import { TaskListModelState } from '../model/tasklist-model-state';
 
 @injectable()
@@ -23,28 +22,17 @@ export class TaskListDeleteElementHandler implements OperationHandler {
     protected lmsClient: TaskListLmsClient;
 
     execute(operation: DeleteElementOperation): MaybePromise<void> {
-        operation.elementIds //
-            .map(elementId => this.getSourceElementToDelete(elementId))
-            .forEach(sModel => {
-                if (sModel) {
-                    if (Task.is(sModel)) {
-                        this.lmsClient.deleteTask(this.modelState.taskList.id, sModel.id);
-                    } else if (Transition.is(sModel)) {
-                        this.lmsClient.deleteTransition(this.modelState.taskList.id, sModel.id);
-                    }
-                }
-            });
+        const modelIds = operation.elementIds.map(elementId => this.getSourceElementId(elementId));
+        this.lmsClient.deleteModels(this.modelState.taskList.id, modelIds);
     }
 
-    private getSourceElementToDelete(elementId: string): Task | Transition | undefined {
+    private getSourceElementId(elementId: string): string {
         const index = this.modelState.index;
         let element: GModelElement | undefined = index.get(elementId);
         if (!(element instanceof GNode || element instanceof GEdge)) {
             element = index.findParentElement(elementId, toTypeGuard(GNode)) ?? index.findParentElement(elementId, toTypeGuard(GEdge));
         }
-        if (element) {
-            return index.findTaskOrTransition(element.id);
-        }
-        return undefined;
+
+        return (element ? index.findTaskOrTransition(element?.id)?.id : elementId) ?? elementId;
     }
 }
