@@ -30,8 +30,8 @@ import { BindingTarget, applyBindingTarget } from '@eclipse-glsp/server-node/lib
 import { injectable, interfaces } from 'inversify';
 import { CreateTaskHandler } from '../handler/create-task-node-handler';
 import { CreateTransitionHandler } from '../handler/create-transition-handler';
-import { DeleteElementHandler } from '../handler/delete-element-handler';
 import { TaskListApplyLabelEditHandler } from '../handler/lms-tasklist-apply-label-edit-handler';
+import { TaskListDeleteElementHandler } from '../handler/lms-tasklist-delete-element-handler';
 import { TaskListReconnectEdgeHandler } from '../handler/lms-tasklist-reconnect-edge-handler';
 import { TaskListChangeBoundsHandler } from '../handler/tasklist-change-bounds-handler';
 import { TaskListLabelEditValidator } from '../handler/tasklist-label-edit-validator';
@@ -90,7 +90,7 @@ export class TaskListDiagramModule extends DiagramModule {
         binding.add(TaskListChangeBoundsHandler);
         binding.add(TaskListApplyLabelEditHandler);
         binding.add(TaskListReconnectEdgeHandler);
-        binding.add(DeleteElementHandler);
+        binding.add(TaskListDeleteElementHandler);
     }
 
     protected override bindGModelIndex(): BindingTarget<GModelIndex> {

@@ -142,6 +142,33 @@ export class TaskListLmsClient {
         return this.getResponseObject(request, ModificationResult.is);
     }
 
+    public async deleteTask(rootId: string, taskId: string): Promise<ModificationResult> {
+        return this.delete('task', rootId, taskId);
+    }
+
+    public async deleteTransition(rootId: string, transitionId: string): Promise<ModificationResult> {
+        return this.delete('transition', rootId, transitionId);
+    }
+
+    private async delete(domain: 'task', rootId: string, modelId: string): Promise<ModificationResult>;
+    private async delete(domain: 'transition', rootId: string, modelId: string): Promise<ModificationResult>;
+    private async delete(domain: string, rootId: string, modelId: string): Promise<ModificationResult> {
+        this.logger.debug(`Deleting ${domain} in '${rootId}' with ID ${modelId}`);
+
+        if (!this.lmsSession) {
+            this.lmsSession = this.createLmsSession();
+        }
+
+        const { HTTP2_HEADER_PATH, HTTP2_HEADER_METHOD } = http2.constants;
+        const request = this.lmsSession.request({
+            [HTTP2_HEADER_PATH]: `/models/${rootId}/${domain}s/${modelId}`,
+            [HTTP2_HEADER_METHOD]: 'DELETE'
+        });
+        request.setEncoding('utf8');
+
+        return this.getResponseObject(request, ModificationResult.is);
+    }
+
     private createLmsSession(): http2.ClientHttp2Session {
         // TODO: Get rid of hardcoded CA certificate
         const certificateAuthority = fs.readFileSync(path.join(__dirname, '../../lms-ssl/cert.pem'));

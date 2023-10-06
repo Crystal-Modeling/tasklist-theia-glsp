@@ -29,7 +29,7 @@ export class TaskListModelIndex extends GModelIndex {
     }
 
     /**
-     * Returns an optional TaskList SourceModel element by its id.
+     * Returns TaskList SourceModel element by its id.
      *
      * @param elementId The id of the requested TaskList source model element.
      */
