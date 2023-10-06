@@ -28,9 +28,9 @@ import {
 } from '@eclipse-glsp/server-node';
 import { BindingTarget, applyBindingTarget } from '@eclipse-glsp/server-node/lib/di/binding-target';
 import { injectable, interfaces } from 'inversify';
-import { CreateTaskHandler } from '../handler/create-task-node-handler';
-import { CreateTransitionHandler } from '../handler/create-transition-handler';
 import { TaskListApplyLabelEditHandler } from '../handler/lms-tasklist-apply-label-edit-handler';
+import { TaskListCreateTaskHandler } from '../handler/lms-tasklist-create-task-node-handler';
+import { TaskListCreateTransitionHandler } from '../handler/lms-tasklist-create-transition-handler';
 import { TaskListDeleteElementHandler } from '../handler/lms-tasklist-delete-element-handler';
 import { TaskListReconnectEdgeHandler } from '../handler/lms-tasklist-reconnect-edge-handler';
 import { TaskListChangeBoundsHandler } from '../handler/tasklist-change-bounds-handler';
@@ -85,8 +85,8 @@ export class TaskListDiagramModule extends DiagramModule {
         // NOTE: LayoutOperationHandler handler is already bound in newer versions of DiagramModule (e.g., 1.1.0-next)
         binding.add(TaskListLayoutOperationHandler);
         // binding.add(LayoutOperationHandler);
-        binding.add(CreateTaskHandler);
-        binding.add(CreateTransitionHandler);
+        binding.add(TaskListCreateTaskHandler);
+        binding.add(TaskListCreateTransitionHandler);
         binding.add(TaskListChangeBoundsHandler);
         binding.add(TaskListApplyLabelEditHandler);
         binding.add(TaskListReconnectEdgeHandler);

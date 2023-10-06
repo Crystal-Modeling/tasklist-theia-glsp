@@ -13,33 +13,32 @@
  *
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
-import { CreateEdgeOperation, CreateOperationHandler, DefaultTypes } from '@eclipse-glsp/server-node';
+import { CreateNodeOperation, CreateNodeOperationHandler, DefaultTypes } from '@eclipse-glsp/server-node';
 import { inject, injectable } from 'inversify';
-import * as uuid from 'uuid';
-import { Transition } from '../model/tasklist-model';
+import { TaskListLmsClient } from '../lms/client/tasklist-lms-client';
+import * as lms from '../lms/model';
 import { TaskListModelState } from '../model/tasklist-model-state';
 
 @injectable()
-export class CreateTransitionHandler extends CreateOperationHandler {
-    readonly elementTypeIds = [DefaultTypes.EDGE];
+export class TaskListCreateTaskHandler extends CreateNodeOperationHandler {
+    readonly elementTypeIds = [DefaultTypes.NODE];
 
     @inject(TaskListModelState)
-    protected modelState: TaskListModelState;
+    protected override modelState: TaskListModelState;
 
-    get operationType(): string {
-        return CreateEdgeOperation.KIND;
-    }
+    @inject(TaskListLmsClient)
+    protected lmsClient: TaskListLmsClient;
 
-    execute(operation: CreateEdgeOperation): void {
-        const transition: Transition = {
-            id: uuid.v4(),
-            sourceTaskId: operation.sourceElementId,
-            targetTaskId: operation.targetElementId
+    execute(operation: CreateNodeOperation): void {
+        // const relativeLocation = this.getRelativeLocation(operation) ?? Point.ORIGIN;
+        const task: lms.Creation<lms.Task> = {
+            name: 'NewTaskNode',
+            content: 'Lorem Ipsum'
         };
-        this.modelState.taskList.transitions.push(transition);
+        this.lmsClient.createTask(this.modelState.taskList.id, task);
     }
 
     get label(): string {
-        return 'Transition';
+        return 'Task';
     }
 }

@@ -3,19 +3,23 @@
   "tasks": [
     {
       "id": "697b6c32-4245-4a42-9484-6e0cc48daf23",
-      "name": "second"
+      "name": "lms"
     },
     {
       "id": "36831586-ef15-47da-b09e-a6ffaef18eeb",
-      "name": "fourth"
+      "name": "editableDiagram"
     },
     {
       "id": "ebf78d87-000e-4d1a-97f2-b164c5cd0894",
-      "name": "1st"
+      "name": "plan"
     },
     {
       "id": "e7f05261-c697-4fc0-90a8-053451e3e273",
-      "name": "3rd"
+      "name": "realTimeDiagram"
+    },
+    {
+      "id": "9f857d26-1488-45fe-8dd6-7c1f05af2cf8",
+      "name": "fullSync"
     }
   ],
   "transitions": [
@@ -33,6 +37,11 @@
       "id": "9404b773-8bc5-484f-840d-8ca492712ad4",
       "sourceTaskId": "e7f05261-c697-4fc0-90a8-053451e3e273",
       "targetTaskId": "36831586-ef15-47da-b09e-a6ffaef18eeb"
+    },
+    {
+      "id": "c32efb7e-272b-4edf-bba0-325784cdf58e",
+      "sourceTaskId": "36831586-ef15-47da-b09e-a6ffaef18eeb",
+      "targetTaskId": "9f857d26-1488-45fe-8dd6-7c1f05af2cf8"
     }
   ]
 }

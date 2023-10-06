@@ -3,6 +3,8 @@ import { LmsModel } from './model';
 
 export type Modification<T extends LmsModel = LmsModel> = Partial<T> & LmsModel;
 
+export type Creation<T extends LmsModel = LmsModel> = Omit<T, keyof LmsModel>;
+
 export type ModificationResult =
     | {
           successful: true;

@@ -1,4 +1,5 @@
-task 1st "Success!" -> second
-task second "Feels rather weird" -> 3rd
-task 3rd "More tasks!" -> fourth
-task fourth "Mooore tasks!!!"
+task plan "Sketch basic plan" -> lms
+task lms "Enrich Langium LSP" -> realTimeDiagram
+task realTimeDiagram "Add GLSP subscription to LMS" -> editableDiagram
+task editableDiagram "Make diagram fully editable with changes reflected in text" -> fullSync
+task fullSync "Success!!! ✅✅"

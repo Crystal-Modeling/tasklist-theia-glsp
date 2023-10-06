@@ -13,37 +13,35 @@
  *
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
-import { CreateNodeOperation, CreateNodeOperationHandler, DefaultTypes, GNode, Point } from '@eclipse-glsp/server-node';
+import { CreateEdgeOperation, CreateOperationHandler, DefaultTypes } from '@eclipse-glsp/server-node';
 import { inject, injectable } from 'inversify';
-import * as uuid from 'uuid';
-import { Task } from '../model/tasklist-model';
+import { TaskListLmsClient } from '../lms/client/tasklist-lms-client';
+import * as lms from '../lms/model';
 import { TaskListModelState } from '../model/tasklist-model-state';
 
 @injectable()
-export class CreateTaskHandler extends CreateNodeOperationHandler {
-    readonly elementTypeIds = [DefaultTypes.NODE];
+export class TaskListCreateTransitionHandler extends CreateOperationHandler {
+    readonly elementTypeIds = [DefaultTypes.EDGE];
 
     @inject(TaskListModelState)
-    protected override modelState: TaskListModelState;
+    protected modelState: TaskListModelState;
 
-    execute(operation: CreateNodeOperation): void {
-        const relativeLocation = this.getRelativeLocation(operation) ?? Point.ORIGIN;
-        const task = this.createTask(relativeLocation);
-        const taskList = this.modelState.taskList;
-        taskList.tasks.push(task);
+    @inject(TaskListLmsClient)
+    protected lmsClient: TaskListLmsClient;
+
+    get operationType(): string {
+        return CreateEdgeOperation.KIND;
     }
 
-    protected createTask(position: Point): Task {
-        const nodeCounter = this.modelState.index.getAllByClass(GNode).length;
-        return {
-            id: uuid.v4(),
-            name: `NewTaskNode${nodeCounter}`,
-            content: 'Lorem Ipsum',
-            position
+    execute(operation: CreateEdgeOperation): void {
+        const newTransition: lms.Creation<lms.Transition> = {
+            sourceTaskId: operation.sourceElementId,
+            targetTaskId: operation.targetElementId
         };
+        this.lmsClient.createTransition(this.modelState.taskList.id, newTransition);
     }
 
     get label(): string {
-        return 'Task';
+        return 'Transition';
     }
 }

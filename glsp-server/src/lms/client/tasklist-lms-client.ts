@@ -6,7 +6,7 @@ import * as path from 'path';
 import { promisify } from 'util';
 import { Model, Task, Transition } from '../model';
 import { Action } from '../model/actions';
-import { Modification, ModificationResult } from '../model/modifications';
+import { Creation, Modification, ModificationResult } from '../model/modifications';
 import { RootUpdate } from '../model/updates';
 import { LmsClientError } from './error';
 import { ModelIdResponse } from './id-response';
@@ -112,6 +112,34 @@ export class TaskListLmsClient {
         request.setEncoding('utf8');
 
         return this.getResponse(request);
+    }
+
+    public async createTask(rootId: string, creation: Creation<Task>): Promise<ModificationResult> {
+        return this.create('task', rootId, creation);
+    }
+
+    public async createTransition(rootId: string, creation: Creation<Transition>): Promise<ModificationResult> {
+        return this.create('transition', rootId, creation);
+    }
+
+    private async create(domain: 'task', rootId: string, creation: Creation<Task>): Promise<ModificationResult>;
+    private async create(domain: 'transition', rootId: string, creation: Creation<Transition>): Promise<ModificationResult>;
+    private async create(domain: string, rootId: string, creation: Creation): Promise<ModificationResult> {
+        this.logger.debug(`Creating ${domain} in '${rootId}':`, creation);
+
+        if (!this.lmsSession) {
+            this.lmsSession = this.createLmsSession();
+        }
+
+        const { HTTP2_HEADER_PATH, HTTP2_HEADER_METHOD } = http2.constants;
+        const request = this.lmsSession.request({
+            [HTTP2_HEADER_PATH]: `/models/${rootId}/${domain}s`,
+            [HTTP2_HEADER_METHOD]: 'POST'
+        });
+        request.setEncoding('utf8');
+        request.write(JSON.stringify(creation), 'utf8');
+
+        return this.getResponseObject(request, ModificationResult.is);
     }
 
     public async updateTask(rootId: string, modification: Modification<Task>): Promise<ModificationResult> {
