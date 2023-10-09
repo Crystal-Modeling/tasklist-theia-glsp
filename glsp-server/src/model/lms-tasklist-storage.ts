@@ -5,6 +5,7 @@ import {
     GLSPServerError,
     MaybePromise,
     ModelSubmissionHandler,
+    Point,
     RequestModelAction,
     TypeGuard
 } from '@eclipse-glsp/server-node';
@@ -98,7 +99,7 @@ export class TaskListStorage extends AbstractJsonModelStorage {
             }
         }
         for (const lmsTask of unmappedLmsTasksById.values()) {
-            reconciledSModel.tasks.push(Task.create(lmsTask, { x: 0, y: 0 }));
+            reconciledSModel.tasks.push(Task.create(lmsTask, Point.ORIGIN));
         }
 
         for (const lmsTransition of lmsModel.transitions) {
@@ -116,7 +117,7 @@ export class TaskListStorage extends AbstractJsonModelStorage {
                     sourceModel.tasks = sourceModel.tasks.filter(t => !idsToRemove.has(t.id));
                 }
                 for (const newTask of update.tasks.added ?? []) {
-                    sourceModel.tasks.push(Task.create(newTask, { x: 0, y: 0 }));
+                    sourceModel.tasks.push(Task.create(newTask, this.modelState.useNewTaskCoordinates() ?? Point.ORIGIN));
                 }
                 for (const taskUpdate of update.tasks.changed ?? []) {
                     this.applyTaskUpdateToSourceModel(taskUpdate, sourceModel);

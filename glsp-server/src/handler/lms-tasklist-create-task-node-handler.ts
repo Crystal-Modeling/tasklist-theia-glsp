@@ -13,7 +13,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
-import { CreateNodeOperation, CreateNodeOperationHandler, DefaultTypes } from '@eclipse-glsp/server-node';
+import { CreateNodeOperation, CreateNodeOperationHandler, DefaultTypes, Point } from '@eclipse-glsp/server-node';
 import { inject, injectable } from 'inversify';
 import { TaskListLmsClient } from '../lms/client/tasklist-lms-client';
 import * as lms from '../lms/model';
@@ -30,9 +30,10 @@ export class TaskListCreateTaskHandler extends CreateNodeOperationHandler {
     protected lmsClient: TaskListLmsClient;
 
     execute(operation: CreateNodeOperation): void {
-        // const relativeLocation = this.getRelativeLocation(operation) ?? Point.ORIGIN;
+        const coordinates = this.getRelativeLocation(operation) ?? this.getLocation(operation) ?? Point.ORIGIN;
+        this.modelState.newTaskCoordinates = coordinates;
         const task: lms.Creation<lms.Task> = {
-            name: 'NewTaskNode',
+            name: 'taskName',
             content: 'Lorem Ipsum'
         };
         this.lmsClient.createTask(this.modelState.taskList.id, task);
