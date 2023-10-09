@@ -14,7 +14,7 @@ import { TaskListLmsClient } from '../lms/client/tasklist-lms-client';
 import * as lms from '../lms/model';
 import { Highlight, Save } from '../lms/model/actions';
 import * as notation from '../notation/model';
-import { TaskList } from './tasklist-model';
+import { Task, TaskList, Transition } from './tasklist-model';
 import { TaskListModelState } from './tasklist-model-state';
 
 @injectable()
@@ -94,15 +94,15 @@ export class TaskListStorage extends AbstractJsonModelStorage {
             const lmsTask = unmappedLmsTasksById.get(nTask.id);
             if (lmsTask) {
                 unmappedLmsTasksById.delete(nTask.id);
-                reconciledSModel.tasks.push({ ...lmsTask, position: nTask.position, size: nTask.size });
+                reconciledSModel.tasks.push(Task.create(lmsTask, nTask.position, nTask.size));
             }
         }
         for (const lmsTask of unmappedLmsTasksById.values()) {
-            reconciledSModel.tasks.push({ ...lmsTask, position: { x: 0, y: 0 } });
+            reconciledSModel.tasks.push(Task.create(lmsTask, { x: 0, y: 0 }));
         }
 
         for (const lmsTransition of lmsModel.transitions) {
-            reconciledSModel.transitions.push({ ...lmsTransition });
+            reconciledSModel.transitions.push(Transition.create(lmsTransition));
         }
         return reconciledSModel;
     }
@@ -116,7 +116,7 @@ export class TaskListStorage extends AbstractJsonModelStorage {
                     sourceModel.tasks = sourceModel.tasks.filter(t => !idsToRemove.has(t.id));
                 }
                 for (const newTask of update.tasks.added ?? []) {
-                    sourceModel.tasks.push({ ...newTask, position: { x: 0, y: 0 } });
+                    sourceModel.tasks.push(Task.create(newTask, { x: 0, y: 0 }));
                 }
                 for (const taskUpdate of update.tasks.changed ?? []) {
                     this.applyTaskUpdateToSourceModel(taskUpdate, sourceModel);
@@ -128,7 +128,7 @@ export class TaskListStorage extends AbstractJsonModelStorage {
                     sourceModel.transitions = sourceModel.transitions.filter(t => !idsToRemove.has(t.id));
                 }
                 for (const newTransition of update.transitions.added ?? []) {
-                    sourceModel.transitions.push({ ...newTransition });
+                    sourceModel.transitions.push(Transition.create(newTransition));
                 }
                 for (const transitionUpdate of update.transitions.changed ?? []) {
                     this.applyTransitionUpdateToSourceModel(transitionUpdate, sourceModel);

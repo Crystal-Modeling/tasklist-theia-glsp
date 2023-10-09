@@ -14,7 +14,8 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 
-import { AnyObject, hasArrayProp, hasObjectProp, hasStringProp } from '@eclipse-glsp/server-node';
+import { AnyObject, Dimension, Point, hasArrayProp, hasObjectProp, hasStringProp } from '@eclipse-glsp/server-node';
+import type * as lms from '../lms/model';
 
 /**
  * The source model for `tasklist` GLSP diagrams. A `TaskList` is a
@@ -66,6 +67,14 @@ export namespace Task {
             hasObjectProp(object, 'position')
         );
     }
+
+    export function create(lmsTask: lms.Task, position: Point, size?: Dimension): Task {
+        return {
+            ...lmsTask,
+            position,
+            size
+        };
+    }
 }
 
 export interface Transition extends SourceElement {
@@ -81,5 +90,9 @@ export namespace Transition {
             hasStringProp(object, 'sourceTaskId') &&
             hasStringProp(object, 'targetTaskId')
         );
+    }
+
+    export function create(lmsTransition: lms.Transition): Transition {
+        return { ...lmsTransition };
     }
 }
