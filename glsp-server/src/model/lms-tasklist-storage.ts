@@ -117,7 +117,7 @@ export class TaskListStorage extends AbstractJsonModelStorage {
                     sourceModel.tasks = sourceModel.tasks.filter(t => !idsToRemove.has(t.id));
                 }
                 for (const newTask of update.tasks.added ?? []) {
-                    sourceModel.tasks.push(Task.create(newTask, this.modelState.useNewTaskCoordinates() ?? Point.ORIGIN));
+                    sourceModel.tasks.push(Task.create(newTask, this.modelState.utilizeNewTaskCoordinates() ?? Point.ORIGIN));
                 }
                 for (const taskUpdate of update.tasks.changed ?? []) {
                     this.applyTaskUpdateToSourceModel(taskUpdate, sourceModel);

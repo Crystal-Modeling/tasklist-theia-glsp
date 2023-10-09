@@ -37,7 +37,7 @@ export class TaskListModelState extends DefaultModelState {
         this.index.indexTaskList(taskList);
     }
 
-    useNewTaskCoordinates(): Point | undefined {
+    utilizeNewTaskCoordinates(): Point | undefined {
         const result = this._newTaskCoordinates;
         this._newTaskCoordinates = undefined;
         return result;

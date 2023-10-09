@@ -114,17 +114,17 @@ export class TaskListLmsClient {
         return this.getResponse(request);
     }
 
-    public async createTask(rootId: string, creation: Creation<Task>): Promise<ModificationResult> {
-        return this.create('task', rootId, creation);
+    public async createTask(rootId: string, creation: Creation<Task>, anchorModelId?: string): Promise<ModificationResult> {
+        return this.create('task', rootId, creation, anchorModelId);
     }
 
     public async createTransition(rootId: string, creation: Creation<Transition>): Promise<ModificationResult> {
         return this.create('transition', rootId, creation);
     }
 
-    private async create(domain: 'task', rootId: string, creation: Creation<Task>): Promise<ModificationResult>;
+    private async create(domain: 'task', rootId: string, creation: Creation<Task>, anchorModelId?: string): Promise<ModificationResult>;
     private async create(domain: 'transition', rootId: string, creation: Creation<Transition>): Promise<ModificationResult>;
-    private async create(domain: string, rootId: string, creation: Creation): Promise<ModificationResult> {
+    private async create(domain: string, rootId: string, creation: Creation, anchorModelId?: string): Promise<ModificationResult> {
         this.logger.debug(`Creating ${domain} in '${rootId}':`, creation);
 
         if (!this.lmsSession) {
@@ -133,7 +133,7 @@ export class TaskListLmsClient {
 
         const { HTTP2_HEADER_PATH, HTTP2_HEADER_METHOD } = http2.constants;
         const request = this.lmsSession.request({
-            [HTTP2_HEADER_PATH]: `/models/${rootId}/${domain}s`,
+            [HTTP2_HEADER_PATH]: `/models/${rootId}/${domain}s` + (anchorModelId ? `?anchorModelId=${anchorModelId}` : ''),
             [HTTP2_HEADER_METHOD]: 'POST'
         });
         request.setEncoding('utf8');
