@@ -163,6 +163,10 @@ export class TaskListStorage extends AbstractJsonModelStorage {
             }
             if (taskUpdate.__state) {
                 sTask.hidden = taskUpdate.__state === 'DISAPPEARED';
+                let newPosition: Point | undefined;
+                if (!sTask.hidden && (newPosition = this.modelState.utilizeNewTaskCoordinates())) {
+                    sTask.position = newPosition;
+                }
             }
             if (modified) {
                 // NOTE: Updating the SourceTask GNode size to the default one to microlayout it automatically
