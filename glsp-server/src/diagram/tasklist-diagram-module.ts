@@ -23,11 +23,13 @@ import {
     InstanceMultiBinding,
     LabelEditValidator,
     ModelState,
+    ModelValidator,
     OperationHandlerConstructor,
     SourceModelStorage
 } from '@eclipse-glsp/server-node';
 import { BindingTarget, applyBindingTarget } from '@eclipse-glsp/server-node/lib/di/binding-target';
 import { injectable, interfaces } from 'inversify';
+import { LmsModelValidator } from '../handler/lms-model-validator';
 import { TaskListApplyLabelEditHandler } from '../handler/lms-tasklist-apply-label-edit-handler';
 import { TaskListCreateTaskHandler } from '../handler/lms-tasklist-create-task-node-handler';
 import { TaskListCreateTransitionHandler } from '../handler/lms-tasklist-create-transition-handler';
@@ -36,6 +38,7 @@ import { TaskListReconnectEdgeHandler } from '../handler/lms-tasklist-reconnect-
 import { TaskListChangeBoundsHandler } from '../handler/tasklist-change-bounds-handler';
 import { TaskListLabelEditValidator } from '../handler/tasklist-label-edit-validator';
 import { TaskListLayoutOperationHandler } from '../layout/lms-tasklist-layout-operation-handler';
+import { LmsClient } from '../lms/client/lms-client';
 import { TaskListLmsClient } from '../lms/client/tasklist-lms-client';
 import { TaskListStorage } from '../model/lms-tasklist-storage';
 import { TaskListGModelFactory } from '../model/tasklist-gmodel-factory';
@@ -56,7 +59,8 @@ export class TaskListDiagramModule extends DiagramModule {
         super.configure(bind, unbind, isBound, rebind);
         const context = { bind, isBound };
         // NOTE: Apply LMS specific bindings
-        applyBindingTarget(context, TaskListLmsClient, TaskListLmsClient).inSingletonScope();
+        context.bind(TaskListLmsClient).toSelf().inSingletonScope();
+        applyBindingTarget(context, LmsClient, { service: TaskListLmsClient }).inSingletonScope();
     }
 
     protected bindDiagramConfiguration(): BindingTarget<DiagramConfiguration> {
@@ -100,5 +104,9 @@ export class TaskListDiagramModule extends DiagramModule {
 
     protected override bindLabelEditValidator(): BindingTarget<LabelEditValidator> | undefined {
         return TaskListLabelEditValidator;
+    }
+
+    protected override bindModelValidator(): BindingTarget<ModelValidator> | undefined {
+        return LmsModelValidator;
     }
 }

@@ -1,23 +1,15 @@
-import { Logger, TypeGuard } from '@eclipse-glsp/server-node';
-import * as fs from 'fs';
 import * as http2 from 'http2';
-import { inject, injectable } from 'inversify';
-import * as path from 'path';
-import { promisify } from 'util';
+import { injectable } from 'inversify';
 import { Model, Task, Transition } from '../model';
 import { Action } from '../model/actions';
 import { Creation, Modification, ModificationResult } from '../model/modifications';
 import { RootUpdate } from '../model/updates';
 import { LmsClientError } from './error';
 import { ModelIdResponse } from './id-response';
+import { LmsClient } from './lms-client';
 
 @injectable()
-export class TaskListLmsClient {
-    @inject(Logger)
-    private logger: Logger;
-
-    private lmsSession: http2.ClientHttp2Session | undefined;
-
+export class TaskListLmsClient extends LmsClient {
     public async getModelId(notationsPath: string): Promise<string> {
         // HACK: Yet another... This endpoint should be temporal: now I manually tweak notation sourcePath to turn it into a URI
         const notationsUri = 'file://' + notationsPath;
@@ -213,50 +205,5 @@ export class TaskListLmsClient {
         request.setEncoding('utf8');
 
         return this.getResponseObject(request, ModificationResult.is);
-    }
-
-    private createLmsSession(): http2.ClientHttp2Session {
-        // TODO: Get rid of hardcoded CA certificate
-        const certificateAuthority = fs.readFileSync(path.join(__dirname, '../../lms-ssl/cert.pem'));
-        const session = http2.connect('https://localhost:8443', {
-            // we don't have to do this if our certificate is signed by
-            // a recognized certificate authority, like LetsEncrypt
-            ca: certificateAuthority
-        });
-        session.on('error', this.logger.error);
-        return session;
-    }
-
-    private async getResponse(request: http2.ClientHttp2Stream): Promise<void> {
-        request.end();
-        await promisify(request.once.bind(request))('end');
-    }
-
-    private async getResponseObject<T>(request: http2.ClientHttp2Stream, guard: TypeGuard<T>): Promise<T> {
-        const data = await this.getResponseAsString(request);
-        return this.convertResponseToJson(data, guard);
-    }
-
-    private async getResponseAsString(request: http2.ClientHttp2Stream): Promise<string> {
-        let data = '';
-        request.on('data', chunk => {
-            data += chunk;
-        });
-        request.end();
-        await promisify(request.once.bind(request))('end');
-        return data;
-    }
-
-    private convertResponseToJson<T>(responseData: string, guard: TypeGuard<T>): T {
-        const response = this.parseResponse(responseData);
-        if (guard(response)) {
-            return response;
-        }
-        throw new LmsClientError("Response received from LMS doesn't comply to expected format");
-    }
-
-    private parseResponse(responseData: string): object {
-        this.logger.info('!!!! RECEIVED RESPONSE FROM LMS !!!! "' + responseData + '"');
-        return JSON.parse(responseData);
     }
 }
