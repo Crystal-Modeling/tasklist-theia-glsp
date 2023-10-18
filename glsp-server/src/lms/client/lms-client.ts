@@ -14,6 +14,21 @@ export abstract class LmsClient {
 
     protected lmsSession: http2.ClientHttp2Session | undefined;
 
+    public async validate(rootId: string): Promise<Marker[]> {
+        this.logger.info('!!!! VALIDATING MODEL THROUGH LMS. ID = ', rootId);
+        if (!this.lmsSession) {
+            this.lmsSession = this.createLmsSession();
+        }
+
+        const { HTTP2_HEADER_PATH, HTTP2_HEADER_METHOD } = http2.constants;
+        const request = this.lmsSession.request({
+            [HTTP2_HEADER_PATH]: `/models/${rootId}/validation`,
+            [HTTP2_HEADER_METHOD]: 'GET'
+        });
+        request.setEncoding('utf8');
+
+        return this.getResponseObject(request, (obj): obj is Marker[] => isArray(obj, isMarker));
+    }
 
     protected createLmsSession(): http2.ClientHttp2Session {
         this.logger.info('Creating LMS Session...');
