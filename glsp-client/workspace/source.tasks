@@ -1,3 +1,6 @@
-task a "First" -> Bab, c, a
-task Bab "First"
-task c "third"
+task first "Go to groceries" -> Second, first, another
+task first "Do something else"
+task Second "Go to groceries" -> third
+task third "do the laundry" -> last
+task last "Take a rest!"
+task 
