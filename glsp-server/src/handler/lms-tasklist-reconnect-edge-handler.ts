@@ -1,4 +1,4 @@
-import { OperationHandler, ReconnectEdgeOperation } from '@eclipse-glsp/server-node';
+import { Logger, OperationHandler, ReconnectEdgeOperation } from '@eclipse-glsp/server-node';
 import { inject, injectable } from 'inversify';
 import type * as lms from 'src/lms/model';
 import { TaskListLmsClient } from '../lms/client/tasklist-lms-client';
@@ -7,6 +7,9 @@ import { TaskListModelState } from '../model/tasklist-model-state';
 @injectable()
 export class TaskListReconnectEdgeHandler implements OperationHandler {
     readonly operationType = ReconnectEdgeOperation.KIND;
+
+    @inject(Logger)
+    protected logger: Logger;
 
     @inject(TaskListModelState)
     protected readonly modelState: TaskListModelState;
@@ -39,6 +42,10 @@ export class TaskListReconnectEdgeHandler implements OperationHandler {
             modification.targetTaskId = target.id;
             // transition.targetTaskId = target.id;
         }
-        this.lmsClient.updateTransition(this.modelState.taskList.id, modification);
+        if (modification.sourceTaskId || modification.targetTaskId) {
+            this.lmsClient.updateTransition(this.modelState.taskList.id, modification);
+        } else {
+            this.logger.info('Transition is not changed');
+        }
     }
 }

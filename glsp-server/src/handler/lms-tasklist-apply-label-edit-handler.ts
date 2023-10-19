@@ -1,5 +1,5 @@
 import { ApplyLabelEditOperation } from '@eclipse-glsp/protocol';
-import { GLSPServerError, OperationHandler } from '@eclipse-glsp/server-node';
+import { GLSPServerError, Logger, OperationHandler } from '@eclipse-glsp/server-node';
 import { inject, injectable } from 'inversify';
 import { TaskListLmsClient } from '../lms/client/tasklist-lms-client';
 import { TaskListModelState } from '../model/tasklist-model-state';
@@ -7,6 +7,9 @@ import { TaskListModelState } from '../model/tasklist-model-state';
 @injectable()
 export class TaskListApplyLabelEditHandler implements OperationHandler {
     readonly operationType = ApplyLabelEditOperation.KIND;
+
+    @inject(Logger)
+    protected logger: Logger;
 
     @inject(TaskListModelState)
     protected readonly modelState: TaskListModelState;
@@ -25,11 +28,14 @@ export class TaskListApplyLabelEditHandler implements OperationHandler {
         switch (propertyName) {
             case 'name':
             case 'content':
-                this.lmsClient.updateTask(this.modelState.taskList.id, { id: task.id, [propertyName]: operation.text });
-                // task[propertyName] = operation.text;
+                if (task[propertyName] !== operation.text) {
+                    this.lmsClient.updateTask(this.modelState.taskList.id, { id: task.id, [propertyName]: operation.text });
+                } else {
+                    this.logger.info('Label content does not differ from the model attribute');
+                }
                 break;
             default:
-                console.warn(`Unable to update task: property ${propertyName} is unknown`);
+                this.logger.warn(`Unable to update task: property ${propertyName} is unknown`);
         }
     }
 }

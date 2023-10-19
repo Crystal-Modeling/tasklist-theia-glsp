@@ -3,6 +3,7 @@ import {
     GEdge,
     GModelElement,
     GNode,
+    Logger,
     MaybePromise,
     OperationHandler,
     toTypeGuard
@@ -15,6 +16,9 @@ import { TaskListModelState } from '../model/tasklist-model-state';
 export class TaskListDeleteElementHandler implements OperationHandler {
     readonly operationType = DeleteElementOperation.KIND;
 
+    @inject(Logger)
+    protected logger: Logger;
+
     @inject(TaskListModelState)
     protected modelState: TaskListModelState;
 
@@ -23,7 +27,11 @@ export class TaskListDeleteElementHandler implements OperationHandler {
 
     execute(operation: DeleteElementOperation): MaybePromise<void> {
         const modelIds = operation.elementIds.map(elementId => this.getSourceElementId(elementId));
-        this.lmsClient.deleteModels(this.modelState.taskList.id, modelIds);
+        if (modelIds.length !== 0) {
+            this.lmsClient.deleteModels(this.modelState.taskList.id, modelIds);
+        } else {
+            this.logger.info('No models selected for deletion');
+        }
     }
 
     private getSourceElementId(elementId: string): string {
