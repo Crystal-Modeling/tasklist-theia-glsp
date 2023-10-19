@@ -3,18 +3,19 @@ import {
     ActionDispatcher,
     CenterAction,
     GLSPServerError,
-    LayoutOperation,
     MaybePromise,
     ModelSubmissionHandler,
+    Point,
     RequestModelAction,
-    SaveModelAction,
     TypeGuard
 } from '@eclipse-glsp/server-node';
 import { inject, injectable } from 'inversify';
+import { LmsSaveModelAction } from '../lms/action-protocol/model-saving';
 import { TaskListLmsClient } from '../lms/client/tasklist-lms-client';
 import * as lms from '../lms/model';
+import { Highlight, Save } from '../lms/model/actions';
 import * as notation from '../notation/model';
-import { TaskList } from './tasklist-model';
+import { Task, TaskList, Transition } from './tasklist-model';
 import { TaskListModelState } from './tasklist-model-state';
 
 @injectable()
@@ -31,9 +32,9 @@ export class TaskListStorage extends AbstractJsonModelStorage {
     @inject(ActionDispatcher)
     protected actionDispatcher: ActionDispatcher;
 
-    public override async loadSourceModel(action: RequestModelAction): Promise<void> {
+    public override async loadSourceModel(requestModelAction: RequestModelAction): Promise<void> {
         // TODO: This is in fact should be changed to `getNotationsUri()`
-        const notationUri = this.getSourceUri(action);
+        const notationUri = this.getSourceUri(requestModelAction);
         const notations = await this.loadNotationsFromFile(notationUri, notation.TaskList.is);
         const lmsModel = await this.lmsClient.getModelById(notations.id);
         const sourceModel = this.combineNotationsWithLmsModel(notations, lmsModel);
@@ -48,19 +49,19 @@ export class TaskListStorage extends AbstractJsonModelStorage {
                 console.debug('Received an update from the server', update);
                 this.modelState.taskList = this.combineLmsUpdateWithSourceModel(update, sourceModel);
                 this.actionDispatcher.dispatchAll(this.submissionHandler.submitModel());
-                this.actionDispatcher.dispatchAfterNextUpdate(LayoutOperation.create([sourceModel.id]));
+                // this.actionDispatcher.dispatchAfterNextUpdate(LayoutOperation.create([sourceModel.id]));
             },
-            rename => {
-                console.debug('Received a rename from the server', rename);
-                this.modelState.taskList = this.combineLmsUpdateWithSourceModel(
-                    { id: notations.id, tasks: { changed: [{ id: rename.id, name: rename.name }] } },
-                    sourceModel
-                );
-                this.actionDispatcher.dispatchAll(this.submissionHandler.submitModel());
-                this.actionDispatcher.dispatchAfterNextUpdate(LayoutOperation.create([rename.id]));
-            },
-            highlight => {
-                this.actionDispatcher.dispatch(CenterAction.create([highlight.id]));
+            action => {
+                if (Highlight.is(action)) {
+                    this.actionDispatcher.dispatch(CenterAction.create([action.id]));
+                } else if (Save.is(action)) {
+                    console.debug('Saving Model...');
+                    // FIXME: When Save action is pushed together with ModelUpdate (i.e., deleting models marked for deletion),
+                    // then notation is modified *after* it is saved with auto-layout
+                    this.actionDispatcher.dispatch(LmsSaveModelAction.create({ persistNotation: true }));
+                } else {
+                    console.warn('Unknown action received', action);
+                }
             }
         );
     }
@@ -94,64 +95,99 @@ export class TaskListStorage extends AbstractJsonModelStorage {
             const lmsTask = unmappedLmsTasksById.get(nTask.id);
             if (lmsTask) {
                 unmappedLmsTasksById.delete(nTask.id);
-                reconciledSModel.tasks.push({ ...lmsTask, position: nTask.position, size: nTask.size });
+                reconciledSModel.tasks.push(Task.create(lmsTask, nTask.position, nTask.size));
             }
         }
         for (const lmsTask of unmappedLmsTasksById.values()) {
-            reconciledSModel.tasks.push({ ...lmsTask, position: { x: 0, y: 0 } });
+            reconciledSModel.tasks.push(Task.create(lmsTask, Point.ORIGIN));
         }
 
         for (const lmsTransition of lmsModel.transitions) {
-            reconciledSModel.transitions.push({ ...lmsTransition });
+            reconciledSModel.transitions.push(Transition.create(lmsTransition));
         }
         return reconciledSModel;
     }
 
-    private combineLmsUpdateWithSourceModel(update: lms.ModelUpdate, sourceModel: TaskList): TaskList {
-        if (update.tasks) {
-            console.debug('Updating tasks');
-            if (update.tasks.removedIds) {
-                const idsToRemove = new Set(update.tasks.removedIds);
-                console.debug('Going to remove', update.tasks.removedIds);
-                sourceModel.tasks = sourceModel.tasks.filter(t => !idsToRemove.has(t.id));
-                console.debug('Tasks after removal', sourceModel.tasks);
-            }
-            for (const newTask of update.tasks.added ?? []) {
-                sourceModel.tasks.push({ ...newTask, position: { x: 0, y: 0 } });
-            }
-            for (const taskUpdate of update.tasks.changed ?? []) {
-                const sTask = sourceModel.tasks.find(t => t.id === taskUpdate.id);
-                if (sTask) {
-                    if (taskUpdate.content) {
-                        sTask.content = taskUpdate.content;
-                    }
-                    if (taskUpdate.name) {
-                        sTask.name = taskUpdate.name;
-                    }
+    private combineLmsUpdateWithSourceModel(update: lms.RootUpdate, sourceModel: TaskList): TaskList {
+        if (lms.ModelUpdate.is(update)) {
+            console.debug('Updating the whole model');
+            if (update.tasks) {
+                if (update.tasks.removedIds) {
+                    const idsToRemove = new Set(update.tasks.removedIds);
+                    sourceModel.tasks = sourceModel.tasks.filter(t => !idsToRemove.has(t.id));
+                }
+                for (const newTask of update.tasks.added ?? []) {
+                    sourceModel.tasks.push(Task.create(newTask, this.modelState.utilizeNewTaskCoordinates() ?? Point.ORIGIN));
+                }
+                for (const taskUpdate of update.tasks.changed ?? []) {
+                    this.applyTaskUpdateToSourceModel(taskUpdate, sourceModel);
                 }
             }
-        }
-        if (update.transitions) {
-            if (update.transitions.removedIds) {
-                const idsToRemove = new Set(update.transitions.removedIds);
-                sourceModel.transitions = sourceModel.transitions.filter(t => !idsToRemove.has(t.id));
-            }
-            for (const newTransition of update.transitions.added ?? []) {
-                sourceModel.transitions.push({ ...newTransition });
-            }
-            for (const transitionUpdate of update.transitions.changed ?? []) {
-                const sTask = sourceModel.transitions.find(t => t.id === transitionUpdate.id);
-                if (sTask) {
-                    if (transitionUpdate.sourceTaskId) {
-                        sTask.sourceTaskId = transitionUpdate.sourceTaskId;
-                    }
-                    if (transitionUpdate.targetTaskId) {
-                        sTask.targetTaskId = transitionUpdate.targetTaskId;
-                    }
+            if (update.transitions) {
+                if (update.transitions.removedIds) {
+                    const idsToRemove = new Set(update.transitions.removedIds);
+                    sourceModel.transitions = sourceModel.transitions.filter(t => !idsToRemove.has(t.id));
                 }
+                for (const newTransition of update.transitions.added ?? []) {
+                    sourceModel.transitions.push(Transition.create(newTransition));
+                }
+                for (const transitionUpdate of update.transitions.changed ?? []) {
+                    this.applyTransitionUpdateToSourceModel(transitionUpdate, sourceModel);
+                }
+            }
+        } else {
+            if (lms.Task.isUpdate(update)) {
+                console.debug('Updating an individual task');
+                this.applyTaskUpdateToSourceModel(update, sourceModel);
+            } else if (lms.Transition.isUpdate(update)) {
+                console.debug('Updating an individual transition');
+                this.applyTransitionUpdateToSourceModel(update, sourceModel);
+            } else {
+                console.warn('Unknown LMS Update, cannot be combined with the source model', update);
             }
         }
         return sourceModel;
+    }
+
+    private applyTaskUpdateToSourceModel(taskUpdate: lms.ElementUpdate<lms.Task>, sourceModel: TaskList): void {
+        const sTask = sourceModel.tasks.find(t => t.id === taskUpdate.id);
+        if (sTask) {
+            let modified = false;
+            if (taskUpdate.content) {
+                sTask.content = taskUpdate.content;
+                modified = true;
+            }
+            if (taskUpdate.name) {
+                sTask.name = taskUpdate.name;
+                modified = true;
+            }
+            if (taskUpdate.__state) {
+                sTask.hidden = taskUpdate.__state === 'DISAPPEARED';
+                let newPosition: Point | undefined;
+                if (!sTask.hidden && (newPosition = this.modelState.utilizeNewTaskCoordinates())) {
+                    sTask.position = newPosition;
+                }
+            }
+            if (modified) {
+                // NOTE: Updating the SourceTask GNode size to the default one to microlayout it automatically
+                sTask.size = undefined;
+            }
+        }
+    }
+
+    private applyTransitionUpdateToSourceModel(transitionUpdate: lms.ElementUpdate<lms.Transition>, sourceModel: TaskList): void {
+        const sTransition = sourceModel.transitions.find(t => t.id === transitionUpdate.id);
+        if (sTransition) {
+            if (transitionUpdate.sourceTaskId) {
+                sTransition.sourceTaskId = transitionUpdate.sourceTaskId;
+            }
+            if (transitionUpdate.targetTaskId) {
+                sTransition.targetTaskId = transitionUpdate.targetTaskId;
+            }
+            if (transitionUpdate.__state) {
+                sTransition.hidden = transitionUpdate.__state === 'DISAPPEARED';
+            }
+        }
     }
 
     private convertSModelToNotations(sModel: TaskList): notation.TaskList {
@@ -166,9 +202,14 @@ export class TaskListStorage extends AbstractJsonModelStorage {
         return TaskList.create(modelId);
     }
 
-    public override saveSourceModel(action: SaveModelAction): MaybePromise<void> {
-        const sourceUri = this.getFileUri(action);
-        // NOTE: Since so far no change is propagated to LMS, only Notation needs to be saved
-        this.writeFile(sourceUri, this.convertSModelToNotations(this.modelState.taskList));
+    public override saveSourceModel(action: LmsSaveModelAction): MaybePromise<void> {
+        if (!action.persistNotation) {
+            // NOTE: 1. Persisting source model remotely on LMS
+            return this.lmsClient.persist(this.modelState.taskList.id);
+        } else {
+            // NOTE: 2. Persisting notation locally
+            const sourceUri = this.getFileUri(action);
+            this.writeFile(sourceUri, this.convertSModelToNotations(this.modelState.taskList));
+        }
     }
 }

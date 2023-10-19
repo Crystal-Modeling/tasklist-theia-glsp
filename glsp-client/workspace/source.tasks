@@ -1,5 +1,6 @@
-task 1st "First task" -> 2nd
-task 2nd "Second task" -> an
-task an "Another task" -> 4th
-task 4th "Call it a day! :)" -> 5
-task 5 "And if another one added?.."
+task first "Go to groceries" -> Second, first, another
+task first "Do something else"
+task Second "Go to groceries" -> third
+task third "do the laundry" -> last
+task last "Take a rest!"
+task 

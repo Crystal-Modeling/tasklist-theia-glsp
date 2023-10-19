@@ -2,37 +2,46 @@
   "id": "7d76e4d7-15d8-4edc-8417-ba5f0c0cbba6",
   "tasks": [
     {
-      "id": "ec45ca5a-0f1c-4ccc-ab82-29c99334210a",
-      "name": "theFirst"
-    },
-    {
       "id": "697b6c32-4245-4a42-9484-6e0cc48daf23",
-      "name": "the2Nd"
+      "name": "lms"
     },
     {
-      "id": "476c380f-1a1f-4cf0-b06e-e728c5573c04",
-      "name": "3rd"
+      "id": "36831586-ef15-47da-b09e-a6ffaef18eeb",
+      "name": "editableDiagram"
     },
     {
-      "id": "f0dd8752-eed6-4072-aa78-12f1541b0e89",
-      "name": "the4th"
+      "id": "ebf78d87-000e-4d1a-97f2-b164c5cd0894",
+      "name": "plan"
+    },
+    {
+      "id": "e7f05261-c697-4fc0-90a8-053451e3e273",
+      "name": "realTimeDiagram"
+    },
+    {
+      "id": "9f857d26-1488-45fe-8dd6-7c1f05af2cf8",
+      "name": "fullSync"
     }
   ],
   "transitions": [
     {
-      "id": "0c03a932-4b87-4e9d-ad40-6fb438dc9981",
-      "sourceTaskId": "ec45ca5a-0f1c-4ccc-ab82-29c99334210a",
+      "id": "228d886f-fe52-4765-a181-98a9aa88ebab",
+      "sourceTaskId": "ebf78d87-000e-4d1a-97f2-b164c5cd0894",
       "targetTaskId": "697b6c32-4245-4a42-9484-6e0cc48daf23"
     },
     {
-      "id": "c11e0afb-7b75-4d8f-bb51-ac5c296b3cd6",
+      "id": "9b9cafe5-5fa2-4e04-bb5c-55e3f4fe1151",
       "sourceTaskId": "697b6c32-4245-4a42-9484-6e0cc48daf23",
-      "targetTaskId": "476c380f-1a1f-4cf0-b06e-e728c5573c04"
+      "targetTaskId": "e7f05261-c697-4fc0-90a8-053451e3e273"
     },
     {
-      "id": "132e9861-81d9-420b-9d1c-2dbae05cce87",
-      "sourceTaskId": "476c380f-1a1f-4cf0-b06e-e728c5573c04",
-      "targetTaskId": "f0dd8752-eed6-4072-aa78-12f1541b0e89"
+      "id": "9404b773-8bc5-484f-840d-8ca492712ad4",
+      "sourceTaskId": "e7f05261-c697-4fc0-90a8-053451e3e273",
+      "targetTaskId": "36831586-ef15-47da-b09e-a6ffaef18eeb"
+    },
+    {
+      "id": "c32efb7e-272b-4edf-bba0-325784cdf58e",
+      "sourceTaskId": "36831586-ef15-47da-b09e-a6ffaef18eeb",
+      "targetTaskId": "9f857d26-1488-45fe-8dd6-7c1f05af2cf8"
     }
   ]
 }

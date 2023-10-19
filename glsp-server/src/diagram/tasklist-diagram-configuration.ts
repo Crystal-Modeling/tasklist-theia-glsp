@@ -52,7 +52,7 @@ export class TaskListDiagramConfiguration implements DiagramConfiguration {
             {
                 elementTypeId: DefaultTypes.EDGE,
                 deletable: true,
-                repositionable: false,
+                repositionable: true,
                 routable: false,
                 sourceElementTypeIds: [DefaultTypes.NODE],
                 targetElementTypeIds: [DefaultTypes.NODE]

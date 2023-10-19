@@ -13,7 +13,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
-import { DefaultModelState } from '@eclipse-glsp/server-node';
+import { DefaultModelState, Point } from '@eclipse-glsp/server-node';
 import { inject, injectable } from 'inversify';
 import { TaskList } from './tasklist-model';
 import { TaskListModelIndex } from './tasklist-model-index';
@@ -25,6 +25,9 @@ export class TaskListModelState extends DefaultModelState {
 
     protected _taskList: TaskList;
 
+    // TODO: This should perhaps be extracted to a separate component
+    protected _newTaskCoordinates: Point | undefined;
+
     get taskList(): TaskList {
         return this._taskList;
     }
@@ -32,5 +35,15 @@ export class TaskListModelState extends DefaultModelState {
     set taskList(taskList: TaskList) {
         this._taskList = taskList;
         this.index.indexTaskList(taskList);
+    }
+
+    utilizeNewTaskCoordinates(): Point | undefined {
+        const result = this._newTaskCoordinates;
+        this._newTaskCoordinates = undefined;
+        return result;
+    }
+
+    set newTaskCoordinates(coordinates: Point) {
+        this._newTaskCoordinates = coordinates;
     }
 }

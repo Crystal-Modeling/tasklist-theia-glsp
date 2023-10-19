@@ -27,3 +27,11 @@ svg {
 .tasklist-node > .sprotty-node {
     fill: #f1bd6c;
 }
+
+.tasklist-node .content {
+    font-size: 12pt;
+}
+
+.tasklist-node .name {
+    font-weight: bold;
+}

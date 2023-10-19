@@ -15,7 +15,7 @@
  ********************************************************************************/
 import { GEdge, GGraph, GLabel, GModelFactory, GNode } from '@eclipse-glsp/server-node';
 import { inject, injectable } from 'inversify';
-import { Task, Transition } from './tasklist-model';
+import { Task, Transition, visible } from './tasklist-model';
 import { TaskListModelState } from './tasklist-model-state';
 
 @injectable()
@@ -26,8 +26,8 @@ export class TaskListGModelFactory implements GModelFactory {
     createModel(): void {
         const taskList = this.modelState.taskList;
         this.modelState.index.indexTaskList(taskList);
-        const childNodes = taskList.tasks.map(task => this.createTaskNode(task));
-        const childEdges = taskList.transitions.map(transition => this.createTransitionEdge(transition));
+        const childNodes = visible(taskList.tasks).map(task => this.createTaskNode(task));
+        const childEdges = visible(taskList.transitions).map(transition => this.createTransitionEdge(transition));
         const newRoot = GGraph.builder() //
             .id(taskList.id)
             .addChildren(childNodes)
@@ -37,11 +37,24 @@ export class TaskListGModelFactory implements GModelFactory {
     }
 
     protected createTaskNode(task: Task): GNode {
-        const builder = GNode.builder()
+        const builder = GNode.builder() //
             .id(task.id)
             .addCssClass('tasklist-node')
-            .add(GLabel.builder().text(task.name).id(`${task.id}_label`).build())
-            .layout('hbox')
+            .addChildren(
+                GLabel.builder() //
+                    .id(task.id + '_name')
+                    .text(task.name)
+                    .addCssClass('name')
+                    .addLayoutOption('hAlign', 'left')
+                    .build(),
+                GLabel.builder() //
+                    .id(task.id + '_content')
+                    .type('label:long')
+                    .text(task.content)
+                    .addCssClass('content')
+                    .build()
+            )
+            .layout('vbox')
             .addLayoutOption('paddingLeft', 5)
             .position(task.position);
 

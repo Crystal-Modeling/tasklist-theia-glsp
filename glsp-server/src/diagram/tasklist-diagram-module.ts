@@ -23,18 +23,22 @@ import {
     InstanceMultiBinding,
     LabelEditValidator,
     ModelState,
+    ModelValidator,
     OperationHandlerConstructor,
     SourceModelStorage
 } from '@eclipse-glsp/server-node';
 import { BindingTarget, applyBindingTarget } from '@eclipse-glsp/server-node/lib/di/binding-target';
 import { injectable, interfaces } from 'inversify';
-import { CreateTaskHandler } from '../handler/create-task-node-handler';
-import { CreateTransitionHandler } from '../handler/create-transition-handler';
-import { DeleteElementHandler } from '../handler/delete-element-handler';
-import { TaskListApplyLabelEditHandler } from '../handler/tasklist-apply-label-edit-handler';
+import { LmsModelValidator } from '../handler/lms-model-validator';
+import { TaskListApplyLabelEditHandler } from '../handler/lms-tasklist-apply-label-edit-handler';
+import { TaskListCreateTaskHandler } from '../handler/lms-tasklist-create-task-node-handler';
+import { TaskListCreateTransitionHandler } from '../handler/lms-tasklist-create-transition-handler';
+import { TaskListDeleteElementHandler } from '../handler/lms-tasklist-delete-element-handler';
+import { TaskListReconnectEdgeHandler } from '../handler/lms-tasklist-reconnect-edge-handler';
 import { TaskListChangeBoundsHandler } from '../handler/tasklist-change-bounds-handler';
 import { TaskListLabelEditValidator } from '../handler/tasklist-label-edit-validator';
 import { TaskListLayoutOperationHandler } from '../layout/lms-tasklist-layout-operation-handler';
+import { LmsClient } from '../lms/client/lms-client';
 import { TaskListLmsClient } from '../lms/client/tasklist-lms-client';
 import { TaskListStorage } from '../model/lms-tasklist-storage';
 import { TaskListGModelFactory } from '../model/tasklist-gmodel-factory';
@@ -55,7 +59,8 @@ export class TaskListDiagramModule extends DiagramModule {
         super.configure(bind, unbind, isBound, rebind);
         const context = { bind, isBound };
         // NOTE: Apply LMS specific bindings
-        applyBindingTarget(context, TaskListLmsClient, TaskListLmsClient).inSingletonScope();
+        context.bind(TaskListLmsClient).toSelf().inSingletonScope();
+        applyBindingTarget(context, LmsClient, { service: TaskListLmsClient }).inSingletonScope();
     }
 
     protected bindDiagramConfiguration(): BindingTarget<DiagramConfiguration> {
@@ -84,11 +89,12 @@ export class TaskListDiagramModule extends DiagramModule {
         // NOTE: LayoutOperationHandler handler is already bound in newer versions of DiagramModule (e.g., 1.1.0-next)
         binding.add(TaskListLayoutOperationHandler);
         // binding.add(LayoutOperationHandler);
-        binding.add(CreateTaskHandler);
-        binding.add(CreateTransitionHandler);
+        binding.add(TaskListCreateTaskHandler);
+        binding.add(TaskListCreateTransitionHandler);
         binding.add(TaskListChangeBoundsHandler);
         binding.add(TaskListApplyLabelEditHandler);
-        binding.add(DeleteElementHandler);
+        binding.add(TaskListReconnectEdgeHandler);
+        binding.add(TaskListDeleteElementHandler);
     }
 
     protected override bindGModelIndex(): BindingTarget<GModelIndex> {
@@ -98,5 +104,9 @@ export class TaskListDiagramModule extends DiagramModule {
 
     protected override bindLabelEditValidator(): BindingTarget<LabelEditValidator> | undefined {
         return TaskListLabelEditValidator;
+    }
+
+    protected override bindModelValidator(): BindingTarget<ModelValidator> | undefined {
+        return LmsModelValidator;
     }
 }
