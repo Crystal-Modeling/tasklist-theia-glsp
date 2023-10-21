@@ -29,6 +29,7 @@ import {
 } from '@eclipse-glsp/server-node';
 import { BindingTarget, applyBindingTarget } from '@eclipse-glsp/server-node/lib/di/binding-target';
 import { injectable, interfaces } from 'inversify';
+import { LmsAutolayoutActionHandler } from '../handler/lms-config-action-handler';
 import { LmsModelValidator } from '../handler/lms-model-validator';
 import { TaskListApplyLabelEditHandler } from '../handler/lms-tasklist-apply-label-edit-handler';
 import { TaskListCreateTaskHandler } from '../handler/lms-tasklist-create-task-node-handler';
@@ -82,6 +83,7 @@ export class TaskListDiagramModule extends DiagramModule {
     protected override configureActionHandlers(binding: InstanceMultiBinding<ActionHandlerConstructor>): void {
         super.configureActionHandlers(binding);
         binding.add(ComputedBoundsActionHandler);
+        binding.add(LmsAutolayoutActionHandler);
     }
 
     protected override configureOperationHandlers(binding: InstanceMultiBinding<OperationHandlerConstructor>): void {

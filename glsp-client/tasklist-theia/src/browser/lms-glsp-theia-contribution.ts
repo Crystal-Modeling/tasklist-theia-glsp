@@ -1,13 +1,8 @@
-import { DiagramMenus } from '@eclipse-glsp/theia-integration';
-import {
-    CommandContribution,
-    CommandRegistry,
-    MenuContribution,
-    MenuModelRegistry,
-    MenuPath,
-    MessageService
-} from '@theia/core/lib/common';
+import { DiagramCommandHandler, DiagramMenus } from '@eclipse-glsp/theia-integration';
+import { ApplicationShell } from '@theia/core/lib/browser';
+import { CommandContribution, CommandRegistry, MenuContribution, MenuModelRegistry, MenuPath } from '@theia/core/lib/common';
 import { inject, injectable } from 'inversify';
+import { Action } from 'sprotty-protocol';
 
 export const EnableAutolayoutCommand = {
     id: 'glsp:lms:autolayout:enable',
@@ -25,16 +20,18 @@ export namespace AutolayoutMenus {
 
 @injectable()
 export class LmsGlspContribution implements CommandContribution {
-    @inject(MessageService)
-    private readonly messageService: MessageService;
+    @inject(ApplicationShell)
+    protected readonly shell: ApplicationShell;
 
     registerCommands(registry: CommandRegistry): void {
-        registry.registerCommand(EnableAutolayoutCommand, {
-            execute: () => this.messageService.info('GLSP Diagram autolayouting is enabled!')
-        });
-        registry.registerCommand(DisableAutolayoutCommand, {
-            execute: () => this.messageService.info('GLSP Diagram autolayouting is disabled!')
-        });
+        registry.registerCommand(
+            EnableAutolayoutCommand,
+            new DiagramCommandHandler(this.shell, widget => widget.actionDispatcher.dispatch(AutolayoutConfigAction.create(true)))
+        );
+        registry.registerCommand(
+            DisableAutolayoutCommand,
+            new DiagramCommandHandler(this.shell, widget => widget.actionDispatcher.dispatch(AutolayoutConfigAction.create(false)))
+        );
     }
 }
 
@@ -50,5 +47,21 @@ export class LmsGlspMenuContribution implements MenuContribution {
             commandId: DisableAutolayoutCommand.id,
             label: 'Disable'
         });
+    }
+}
+
+// TODO: Remove duplicates (action declared in glsp-server)
+export interface AutolayoutConfigAction extends Action {
+    kind: typeof AutolayoutConfigAction.KIND;
+    enable: boolean;
+}
+export namespace AutolayoutConfigAction {
+    export const KIND = 'autolayout-config';
+
+    export function create(enable: boolean): AutolayoutConfigAction {
+        return {
+            kind: KIND,
+            enable
+        };
     }
 }
