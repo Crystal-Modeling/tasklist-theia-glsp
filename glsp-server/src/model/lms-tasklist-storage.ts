@@ -3,6 +3,7 @@ import {
     ActionDispatcher,
     CenterAction,
     GLSPServerError,
+    LayoutOperation,
     MaybePromise,
     ModelSubmissionHandler,
     Point,
@@ -12,6 +13,7 @@ import {
 import { inject, injectable } from 'inversify';
 import { LmsSaveModelAction } from '../lms/action-protocol/model-saving';
 import { TaskListLmsClient } from '../lms/client/tasklist-lms-client';
+import { LmsConfiguration } from '../lms/lms-configuration';
 import * as lms from '../lms/model';
 import { Highlight, Save } from '../lms/model/actions';
 import * as notation from '../notation/model';
@@ -32,6 +34,9 @@ export class TaskListStorage extends AbstractJsonModelStorage {
     @inject(ActionDispatcher)
     protected actionDispatcher: ActionDispatcher;
 
+    @inject(LmsConfiguration)
+    protected lmsConfiguration: LmsConfiguration;
+
     public override async loadSourceModel(requestModelAction: RequestModelAction): Promise<void> {
         // TODO: This is in fact should be changed to `getNotationsUri()`
         const notationUri = this.getSourceUri(requestModelAction);
@@ -49,7 +54,9 @@ export class TaskListStorage extends AbstractJsonModelStorage {
                 console.debug('Received an update from the server', update);
                 this.modelState.taskList = this.combineLmsUpdateWithSourceModel(update, sourceModel);
                 this.actionDispatcher.dispatchAll(this.submissionHandler.submitModel());
-                // this.actionDispatcher.dispatchAfterNextUpdate(LayoutOperation.create([sourceModel.id]));
+                if (this.lmsConfiguration.autolayouting) {
+                    this.actionDispatcher.dispatchAfterNextUpdate(LayoutOperation.create([sourceModel.id]));
+                }
             },
             action => {
                 if (Highlight.is(action)) {
