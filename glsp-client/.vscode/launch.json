@@ -64,6 +64,36 @@
       "outputCapture": "std"
     },
     {
+      "type": "node",
+      "request": "launch",
+      "name": "Launch DEMO TaskList Theia Backend (External GLSP Server)",
+      "program": "${workspaceRoot}/tasklist-browser-app/src-gen/backend/main.js",
+      "args": [
+        "--port=3000",
+        "--no-cluster",
+        "--TASKLIST_GLSP=5007",
+        "--debug",
+        "--app-project-path=${workspaceRoot}/tasklist-browser-app",
+        "--root-dir=${workspaceRoot}/demo",
+        "--plugins=local-dir://${workspaceRoot}/vsc-extensions"
+      ],
+      "env": {
+        "NODE_ENV": "development"
+      },
+      "sourceMaps": true,
+      "outFiles": [
+        "${workspaceRoot}/node_modules/@theia/*/lib/**/*.js",
+        "${workspaceRoot}/node_modules/@eclipse-glsp/*/lib/**/*.js",
+        "${workspaceRoot}/tasklist-browser-app/lib/**/*.js",
+        "${workspaceRoot}/tasklist-theia/lib/**/*.js",
+        "${workspaceRoot}/tasklist-glsp/lib/**/*.js",
+        "${workspaceRoot}/tasklist-browser-app/src-gen/**/*.js"
+      ],
+      "smartStep": true,
+      "internalConsoleOptions": "openOnSessionStart",
+      "outputCapture": "std"
+    },
+    {
       "name": "Launch Theia Frontend",
       "type": "chrome",
       "request": "launch",
