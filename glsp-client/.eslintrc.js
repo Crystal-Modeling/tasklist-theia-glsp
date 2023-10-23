@@ -7,5 +7,13 @@ module.exports = {
     parserOptions: {
         tsconfigRootDir: __dirname,
         project: 'tsconfig.eslint.json'
-    }
+    },
+    overrides: [
+        {
+            files: ['lms-*', '**/lms/**', '**/notation/**'],
+            rules: {
+                'header/header': 'off'
+            }
+        }
+    ]
 };

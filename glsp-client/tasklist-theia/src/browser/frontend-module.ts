@@ -14,7 +14,9 @@
  * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
  ********************************************************************************/
 import { ContainerContext, DiagramConfiguration, GLSPTheiaFrontendModule } from '@eclipse-glsp/theia-integration';
+import { CommandContribution, MenuContribution } from '@theia/core/lib/common';
 import { TaskListLanguage } from '../common/tasklist-language';
+import { LmsGlspContribution, LmsGlspMenuContribution } from './lms-glsp-theia-contribution';
 import { TasklistDiagramConfiguration } from './tasklist-diagram-configuration';
 
 export class TaskListTheiaFrontendModule extends GLSPTheiaFrontendModule {
@@ -22,6 +24,8 @@ export class TaskListTheiaFrontendModule extends GLSPTheiaFrontendModule {
 
     bindDiagramConfiguration(context: ContainerContext): void {
         context.bind(DiagramConfiguration).to(TasklistDiagramConfiguration);
+        context.bind(CommandContribution).to(LmsGlspContribution);
+        context.bind(MenuContribution).to(LmsGlspMenuContribution);
     }
 }
 

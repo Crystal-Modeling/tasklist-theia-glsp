@@ -29,6 +29,7 @@ import {
 } from '@eclipse-glsp/server-node';
 import { BindingTarget, applyBindingTarget } from '@eclipse-glsp/server-node/lib/di/binding-target';
 import { injectable, interfaces } from 'inversify';
+import { LmsAutolayoutActionHandler } from '../handler/lms-autolayout-config-handler';
 import { LmsModelValidator } from '../handler/lms-model-validator';
 import { TaskListApplyLabelEditHandler } from '../handler/lms-tasklist-apply-label-edit-handler';
 import { TaskListCreateTaskHandler } from '../handler/lms-tasklist-create-task-node-handler';
@@ -40,6 +41,7 @@ import { TaskListLabelEditValidator } from '../handler/tasklist-label-edit-valid
 import { TaskListLayoutOperationHandler } from '../layout/lms-tasklist-layout-operation-handler';
 import { LmsClient } from '../lms/client/lms-client';
 import { TaskListLmsClient } from '../lms/client/tasklist-lms-client';
+import { LmsConfiguration } from '../lms/lms-configuration';
 import { TaskListStorage } from '../model/lms-tasklist-storage';
 import { TaskListGModelFactory } from '../model/tasklist-gmodel-factory';
 import { TaskListModelIndex } from '../model/tasklist-model-index';
@@ -61,6 +63,7 @@ export class TaskListDiagramModule extends DiagramModule {
         // NOTE: Apply LMS specific bindings
         context.bind(TaskListLmsClient).toSelf().inSingletonScope();
         applyBindingTarget(context, LmsClient, { service: TaskListLmsClient }).inSingletonScope();
+        context.bind(LmsConfiguration).toSelf().inSingletonScope();
     }
 
     protected bindDiagramConfiguration(): BindingTarget<DiagramConfiguration> {
@@ -82,6 +85,7 @@ export class TaskListDiagramModule extends DiagramModule {
     protected override configureActionHandlers(binding: InstanceMultiBinding<ActionHandlerConstructor>): void {
         super.configureActionHandlers(binding);
         binding.add(ComputedBoundsActionHandler);
+        binding.add(LmsAutolayoutActionHandler);
     }
 
     protected override configureOperationHandlers(binding: InstanceMultiBinding<OperationHandlerConstructor>): void {
