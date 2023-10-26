@@ -21,23 +21,31 @@
   "transitions": [
     {
       "id": "43a1f58e-5d64-433b-a332-58b21c8ae7aa",
-      "sourceTaskId": "b83654ee-d63e-4959-a0bf-789931f5dac0",
-      "targetTaskId": "1a8665b5-ea00-4793-b890-a2486f54c764"
+      "name": {
+        "sourceTaskId": "b83654ee-d63e-4959-a0bf-789931f5dac0",
+        "targetTaskId": "1a8665b5-ea00-4793-b890-a2486f54c764"
+      }
     },
     {
       "id": "cf71f916-8f48-41bb-9819-9fb05b804601",
-      "sourceTaskId": "b83654ee-d63e-4959-a0bf-789931f5dac0",
-      "targetTaskId": "b83654ee-d63e-4959-a0bf-789931f5dac0"
+      "name": {
+        "sourceTaskId": "b83654ee-d63e-4959-a0bf-789931f5dac0",
+        "targetTaskId": "b83654ee-d63e-4959-a0bf-789931f5dac0"
+      }
     },
     {
       "id": "ceb37140-9454-4bce-a37a-169300dcc29b",
-      "sourceTaskId": "1a8665b5-ea00-4793-b890-a2486f54c764",
-      "targetTaskId": "0eaa55fb-8c3c-4f9e-b70c-8e0cef6e2f00"
+      "name": {
+        "sourceTaskId": "1a8665b5-ea00-4793-b890-a2486f54c764",
+        "targetTaskId": "0eaa55fb-8c3c-4f9e-b70c-8e0cef6e2f00"
+      }
     },
     {
       "id": "9c392123-f142-4b50-8d47-8ccbb891c565",
-      "sourceTaskId": "0eaa55fb-8c3c-4f9e-b70c-8e0cef6e2f00",
-      "targetTaskId": "ba902a58-9a54-4e90-9aa9-791d447d9f98"
+      "name": {
+        "sourceTaskId": "0eaa55fb-8c3c-4f9e-b70c-8e0cef6e2f00",
+        "targetTaskId": "ba902a58-9a54-4e90-9aa9-791d447d9f98"
+      }
     }
   ]
 }
