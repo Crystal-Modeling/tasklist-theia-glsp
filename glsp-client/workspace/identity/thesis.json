@@ -1,0 +1,22 @@
+{
+  "id": "ca256bb8-47a5-4dd1-a474-71a16488b6e4",
+  "tasks": [
+    {
+      "id": "d8f95a69-a8d1-4029-bee1-3e48c6695e70",
+      "name": "start"
+    },
+    {
+      "id": "584f0d5d-a8c3-4229-aa51-b4aad9527031",
+      "name": "library"
+    }
+  ],
+  "transitions": [
+    {
+      "id": "bac77781-9aa5-42e0-a88d-7de43dbb7f3e",
+      "name": {
+        "sourceTaskId": "d8f95a69-a8d1-4029-bee1-3e48c6695e70",
+        "targetTaskId": "584f0d5d-a8c3-4229-aa51-b4aad9527031"
+      }
+    }
+  ]
+}

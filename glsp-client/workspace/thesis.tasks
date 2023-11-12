@@ -1,0 +1,8 @@
+task start "Get up at 6 AM" -> library
+
+
+
+
+
+task start "Sleep till noon"
+task library "go to the library!"
