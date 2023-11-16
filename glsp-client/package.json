@@ -24,9 +24,9 @@
     }
   ],
   "scripts": {
-    "prepare": "lerna run prepare",
+    "prepare": "lerna run prepare && yarn --cwd vsc-extensions/tasklist-lang package",
     "watch": "lerna run --parallel watch",
-    "build": "yarn install:only && lerna run build",
+    "build": "yarn install:only && lerna run build && yarn --cwd vsc-extensions/tasklist-lang package",
     "lint": "lerna run lint --",
     "install:only": "yarn install --ignore-scripts",
     "rebuild:browser": "theia rebuild:browser",
