@@ -1,34 +1,4 @@
-# Eclipse GLSP - Project Template:<br> 🖥️ Node ● 🗂️ Custom JSON ● 🖼️ Theia
-
-This folder contains a simple _project template_ to get you started quickly for your diagram editor implementation based on [GLSP](https://github.com/eclipse-glsp/glsp).
-It provides the initial setup of the package architecture and environment for a GLSP diagram editor that uses ...
-
-- 🖥️ The [Node-based GLSP server framework](https://github.com/eclipse-glsp/glsp-server-node)
-- 🗂️ A custom JSON format as source model
-- 🖼️ The [Theia integration](https://github.com/eclipse-glsp/glsp-theia-integration) to make your editor available in a Theia browser application
-
-To explore alternative project templates or learn more about developing GLSP-based diagram editors, please refer to the [Getting Started](https://www.eclipse.org/glsp/documentation/gettingstarted) guide.
-
-## Project structure
-
-This project is structured as follows:
-
-- [`glsp-client`](glsp-client)
-  - [`tasklist-browser-app`](glsp-client/tasklist-browser-app): browser client application that integrates the basic Theia plugins and the tasklist specific glsp plugins
-  - [`tasklist-glsp`](glsp-client/tasklist-glsp): diagram client configuring the views for rendering and the user interface modules
-  - [`tasklist-theia`](glsp-client/tasklist-theia): glue code for integrating the editor into Theia
-  - [`workspace`](glsp-client/workspace): contains an example file that can be opened with this diagram editor
-  - [`vsc-extensions/tasklist-lang`](glsp-client/vsc-extensions/tasklist-lang): Git Submodule, fetching tasklist-lang repository with VSCode extension for TaskList Langium Language Server (with Langium Model Server 'extension')
-- [`glsp-server`](glsp-server)
-  - [`src/diagram`](glsp-server/src/diagram): dependency injection module of the server and diagram configuration
-  - [`src/handler`](glsp-server/src/handler): handlers for the diagram-specific actions
-  - [`src/model`](glsp-server/src/model): all source model, graphical model and model state related files
-
-The most important entry points are:
-
-- [`glsp-client/tasklist-glsp/src/di.config.ts`](glsp-client/tasklist-glsp/src/di.config.ts): dependency injection module of the client
-- [`glsp-client/tasklist-browser-app/package.json`](glsp-client/tasklist-browser-app/package.json): Theia browser application definition
-- [`glsp-server/src/diagram/tasklist-diagram-module.ts`](glsp-server/src/diagram/tasklist-diagram-module.ts): dependency injection module of the server
+# Langium Model Server PoC
 
 ## Prerequisites
 
@@ -74,15 +44,141 @@ yarn build:client
 yarn build:server
 ```
 
-## Building packaged VSCode extensions (tasklist-lang)
+### Building packaged VSCode extensions (tasklist-lang)
 
-To have tasklist-lang prepackaged into Theia build, it has to be built using the following command (from [`vsc-extensions/tasklist-lang`](glsp-client/vsc-extensions/tasklist-lang)) directory:
+To have tasklist-lang packaged into Theia build, it has to be built using the following command (from [`vsc-extensions/tasklist-lang`](glsp-client/vsc-extensions/tasklist-lang)) directory:
 
 ```bash
-npm run rebuild && npm run vscode:prepublish
+npm run package
 ```
 
 ❗ You don't have to package it into VSIX file (though you could, with `npx vsce package` command).
+
+## Demoing the example
+
+The following demonstration has been presented at the [TheiaCon 2023](https://events.eclipse.org/2023/theiacon/).
+
+Describe, that you developed an approach to use textual language as a source model for the diagrams.
+This approach enables editing the language models equally either by editing the model in text (as a textual code), or visually (on a diagram).
+This serves as a basis for modern open-source Low-code platforms, suggesting a technology to be used in platform IDE to add support for heterogeneous interactions with the model.
+
+1. Start Theia IDE and embedded GLSP server using "Launch Tasklist Theia DEMO" launch config
+
+There are existing technologies:
+
+- Language Server (LS) for rich text editing,
+- Graphical Language Server Platform (GLSP) for rich diagrams editing.
+
+My approach extends Language Server, turining it to a Model Server, exposing models through an API, supporting subscription to the model updates, and external modification of the models (through an API). For this demonstration I use primitive tasklist language, declaring Tasks for some process, and sequence them with Transitions.
+
+### TEXT EDITING (With diagram updates)
+
+Talk about existing technology -- Language Server, that facilitates rich text editing: autocompletion, code actions, renaming, and language validation.
+
+1. Create Files:
+   - new file 'shopping.tasks'
+   - Having 'shopping.tasks' in focus, create new file 'shopping.tasklist'. Move it to the right-side pane.
+2. Demonstrate LSP capabilities:
+
+   - Autocomplete (type the first task: `task 1 "Fruits"`)
+   - Code Actions (typing ` -> next` and pressing Enter), modifying the tasks model to
+
+   ```tasklist
+   task 1 "Fruits" -> vegs
+   task vegs "Vegetables"
+   ```
+
+   - Rename handler (pressing Fn+F2 on `vegs` task name and renaming it to `2` to be consize):
+
+   ```tasklist
+   task 1 "Fruits" -> 2
+   task 2 "Vegetables"
+   ```
+
+3. Demonstrate selection sync: Click on different text nodes (e.g., `slr`, then `proposal`) in 'shopping.tasks' on the left (watch how different nodes on the diagram get centered)
+4. Demonstrate saving sync: Save 'shopping.tasks' (watch 'shopping.tasklist' gets saved automatically)
+5. Demonstrate invalid models are not exposed (not digested to the diagram server) by replacing the content of the editor with the following:
+
+   ```tasklist
+   task 1 "Fruits" -> 2, 2
+   task 1 "Fruits again"
+   task 2 "Vegetables" -> 3
+   task "No name"
+   ```
+
+   Then don't forget to restore the editor content.
+   Those ☝️ are both
+
+   - model (semantic?) errors, when there is a duplicate task (1) or transition (1->2)
+   - language (parsing, linking) errors, when a reference to a task is not resolved (3->4) or a task doesn't have a name (the last task)
+
+### DIAGRAM EDITING (With source model updates in the text editor)
+
+Langium Model Server brings extra advantages: rich _editing_ of the model from the diagram side.
+Let's create some subtasks for our shopping list, from the diagram side.
+==Now switch off diagram autolayouting==
+
+6. Demonstrate Tasks and Transitions creation, editing, and deletion:
+
+   - Create new Task to the left of Task 1 (watch it is created between tasks 1 and 2 in 'shopping.tasks')
+   - Create another Task somewhere on the bottom (watch it is created at the end with the name "taskName_2")
+   - Create new Transition from Task 1 to taskName
+   - Update "taskName" name to "oranges" and content to "Red oranges" (watch corresponding updates in 'shopping.tasks')
+   - Edit Task taskName_2 content, it to to "Potatoes" (watch it is updated in 'shopping.tasks')
+   - Create new Transition from Task oranges to taskName_2 (let's say we made a mistake)
+   - Update "taskName_2" name to "potatoes"
+   - Change the sourceTask for Transition oranges->potatoes (2->potatoes)
+   - Attempt to create new Transition with duplicate name (watch it was not added to the model)
+   - Demonstrate models deletion: add couple of more tasks, and transitions, and then delete everything apart from:
+
+   ```tasklist
+   task 1 "Fruits" -> 2, oranges
+   task oranges "Red oranges"
+   task 2 "Vegetables" -> potatoes
+   task potatoes "Potatoes"
+   ```
+
+7. Demonstrate saving sync: Save the diagram (watch 'shopping.tasks' is also saved)
+
+### LMS MODEL VALIDATION
+
+8. Demonstrate LSP validation (switch to the Problems tab in the bottom panel)
+
+   - Modify 'shopping.tasks' to:
+
+   ```tasklist
+   task 1 "Fruits" -> 2, oranges
+   task oranges "Red oranges" -> lemons
+   task lemons "zesty lemons"
+   task 2 "Vegetables" -> potatoes
+   task potatoes "Potatoes" -> potatoes
+   ```
+
+   - Watch the language errors: task lemons has lowercased content, and task potatoes references itself
+
+9. Demonstrate how GLSP diagram consumes LSP validation by using LMS validation endpoint:
+   - Click 'Validate model' button on GLSP diagram pallete -- watch the validation markers (❕and ❌ appear on the invalid Task nodes and Transition edge), which, when hovered, displays exactly the same validation message, as the one observable in the LSP text editor.
+
+## Project structure
+
+This project is structured as follows:
+
+- [`glsp-client`](glsp-client)
+  - [`tasklist-browser-app`](glsp-client/tasklist-browser-app): browser client application that integrates the basic Theia plugins and the tasklist specific glsp plugins
+  - [`tasklist-glsp`](glsp-client/tasklist-glsp): diagram client configuring the views for rendering and the user interface modules
+  - [`tasklist-theia`](glsp-client/tasklist-theia): glue code for integrating the editor into Theia
+  - [`workspace`](glsp-client/workspace): contains an example file that can be opened with this diagram editor
+  - [`vsc-extensions/tasklist-lang`](glsp-client/vsc-extensions/tasklist-lang): Git Submodule, fetching tasklist-lang repository with VSCode extension for TaskList Langium Language Server (with Langium Model Server 'extension')
+- [`glsp-server`](glsp-server)
+  - [`src/diagram`](glsp-server/src/diagram): dependency injection module of the server and diagram configuration
+  - [`src/handler`](glsp-server/src/handler): handlers for the diagram-specific actions
+  - [`src/model`](glsp-server/src/model): all source model, graphical model and model state related files
+
+The most important entry points are:
+
+- [`glsp-client/tasklist-glsp/src/di.config.ts`](glsp-client/tasklist-glsp/src/di.config.ts): dependency injection module of the client
+- [`glsp-client/tasklist-browser-app/package.json`](glsp-client/tasklist-browser-app/package.json): Theia browser application definition
+- [`glsp-server/src/diagram/tasklist-diagram-module.ts`](glsp-server/src/diagram/tasklist-diagram-module.ts): dependency injection module of the server
 
 ## Running the example
 
@@ -137,16 +233,3 @@ Here you can choose between four different launch configurations:
   Launches a Google chrome instance, opens the Theia browser application at `http://localhost:3000` and will automatically open an example workspace that contains a `example.tasklist` file.
   Double-click the file in the `Explorer` to open it with the `Tasklist Diagram Editor`.
   Breakpoints in the source files of the `glsp-client/**/browser` directories will be picked up.
-
-## Next steps
-
-Once you are up and running with this project template, we recommend to refer to the [Getting Started](https://www.eclipse.org/glsp/documentation) to learn how to
-
-- ➡️ Add your custom [source model](https://www.eclipse.org/glsp/documentation/sourcemodel) instead of using the example model
-- ➡️ Define the diagram elements to be generated from the source model into the [graphical model](https://www.eclipse.org/glsp/documentation/gmodel)
-- ➡️ Make the diagram look the way you want by adjusting the [diagram rendering and styling](https://www.eclipse.org/glsp/documentation/rendering)
-
-## More information
-
-For more information, please visit the [Eclipse GLSP Umbrella repository](https://github.com/eclipse-glsp/glsp) and the [Eclipse GLSP Website](https://www.eclipse.org/glsp/).
-If you have questions, please raise them in the [discussions](https://github.com/eclipse-glsp/glsp/discussions) and have a look at our [communication and support options](https://www.eclipse.org/glsp/contact/).
