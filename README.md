@@ -13,17 +13,6 @@ The examples are heavily interweaved with Eclipse Theia, so please also check th
 
 This project template is compatible with Theia `>=1.37.2`.
 
-## VS Code workspace
-
-To work with the source code and debug the example in VS Code a dedicated [VS Code Workspace](node-json-theia.code-workspace) is provided.
-The workspace includes both the `glsp-client` and `glsp-server` sources and offers dedicated launch configurations to run and debug the example application.
-
-To open the workspace start a VS Code instance and use the `Open Workspace from File..` entry from the `File` menu.
-Then navigate to the directory containing the workspace file and open the `node-json-theia.code-workspace` file.
-
-For a smooth development experience we recommend a set of useful VS Code extensions. When the workspace is first opened VS Code will ask you wether you want to install those recommended extensions.
-Alternatively, you can also open the `Extension View` (Ctrl + Shift + X) and type `@recommended` into the search field to see the list of `Workspace Recommendations`.
-
 ## Building the example
 
 The server component and the client component have to be built using `yarn`.
@@ -34,7 +23,7 @@ To build all components execute the following in the directory containing this R
 yarn build
 ```
 
-In addition, it is also possible to build each component individually:
+Alternatively, it is possible to build each component individually:
 
 ```bash
 # Build only the glsp-client
@@ -46,7 +35,15 @@ yarn build:server
 
 ### Building packaged VSCode extensions (tasklist-lang)
 
-To have tasklist-lang packaged into Theia build, it has to be built using the following command (from [`vsc-extensions/tasklist-lang`](glsp-client/vsc-extensions/tasklist-lang)) directory:
+❗ Before building tasklist-lang, ensure its source code is loaded to this repo from Git submodule:
+From [`glsp-server`](glsp-server) directory, execute the following from the embedded terminal:
+
+```bash
+git submodule init
+git submodule update
+```
+
+To have tasklist-lang packaged into Theia build, it has to be built using the following command (from [`glsp-client/vsc-extensions/tasklist-lang`](glsp-client/vsc-extensions/tasklist-lang)) directory:
 
 ```bash
 npm run package
@@ -56,24 +53,17 @@ npm run package
 
 ## Demoing the example
 
-The following demonstration has been presented at the [TheiaCon 2023](https://events.eclipse.org/2023/theiacon/).
+The following demonstration has been presented at the [TheiaCon 2023](https://events.eclipse.org/2023/theiacon/). You can find the session recording [here](https://www.youtube.com/watch?v=MktROv0bdwk).
 
-Describe, that you developed an approach to use textual language as a source model for the diagrams.
+LMS demonstrates an approach to use textual language as a source model for the diagrams.
 This approach enables editing the language models equally either by editing the model in text (as a textual code), or visually (on a diagram).
 This serves as a basis for modern open-source Low-code platforms, suggesting a technology to be used in platform IDE to add support for heterogeneous interactions with the model.
 
 1. Start Theia IDE and embedded GLSP server using "Launch Tasklist Theia DEMO" launch config
 
-There are existing technologies:
-
-- Language Server (LS) for rich text editing,
-- Graphical Language Server Platform (GLSP) for rich diagrams editing.
-
-My approach extends Language Server, turining it to a Model Server, exposing models through an API, supporting subscription to the model updates, and external modification of the models (through an API). For this demonstration I use primitive tasklist language, declaring Tasks for some process, and sequence them with Transitions.
-
 ### TEXT EDITING (With diagram updates)
 
-Talk about existing technology -- Language Server, that facilitates rich text editing: autocompletion, code actions, renaming, and language validation.
+Technology, which enables rich editing capabilities for a textual editor (autocompletion, code actions, renaming, and language validation) is called Language Server.
 
 1. Create Files:
    - new file 'shopping.tasks'
@@ -106,19 +96,23 @@ Talk about existing technology -- Language Server, that facilitates rich text ed
    task "No name"
    ```
 
-   Then don't forget to restore the editor content.
-   Those ☝️ are both
+   Those ☝️ are both:
 
    - model (semantic?) errors, when there is a duplicate task (1) or transition (1->2)
    - language (parsing, linking) errors, when a reference to a task is not resolved (3->4) or a task doesn't have a name (the last task)
 
+6. Restore the editor content (Hit Ctrl+Z).
+
 ### DIAGRAM EDITING (With source model updates in the text editor)
 
 Langium Model Server brings extra advantages: rich _editing_ of the model from the diagram side.
-Let's create some subtasks for our shopping list, from the diagram side.
-==Now switch off diagram autolayouting==
 
-6. Demonstrate Tasks and Transitions creation, editing, and deletion:
+7. Switch off diagram autolayouting:
+
+   - Open IDE Command Pallete (Ctrl+Shift+P)
+   - Enter 'Disable GLSP diagram autolayouting' into the pallete input and hit Enter to execute command
+
+8. Demonstrate Tasks and Transitions creation, editing, and deletion:
 
    - Create new Task to the left of Task 1 (watch it is created between tasks 1 and 2 in 'shopping.tasks')
    - Create another Task somewhere on the bottom (watch it is created at the end with the name "taskName_2")
@@ -138,11 +132,11 @@ Let's create some subtasks for our shopping list, from the diagram side.
    task potatoes "Potatoes"
    ```
 
-7. Demonstrate saving sync: Save the diagram (watch 'shopping.tasks' is also saved)
+9. Demonstrate saving sync: Save the diagram (watch 'shopping.tasks' is also saved)
 
 ### LMS MODEL VALIDATION
 
-8. Demonstrate LSP validation (switch to the Problems tab in the bottom panel)
+10. Demonstrate LSP validation (switch to the Problems tab in the bottom panel)
 
    - Modify 'shopping.tasks' to:
 
@@ -156,8 +150,19 @@ Let's create some subtasks for our shopping list, from the diagram side.
 
    - Watch the language errors: task lemons has lowercased content, and task potatoes references itself
 
-9. Demonstrate how GLSP diagram consumes LSP validation by using LMS validation endpoint:
+11. Demonstrate how GLSP diagram consumes LSP validation by using LMS validation endpoint:
    - Click 'Validate model' button on GLSP diagram pallete -- watch the validation markers (❕and ❌ appear on the invalid Task nodes and Transition edge), which, when hovered, displays exactly the same validation message, as the one observable in the LSP text editor.
+
+## VS Code workspace
+
+To work with the source code and debug the example in VS Code a dedicated [VS Code Workspace](node-json-theia.code-workspace) is provided.
+The workspace includes both the `glsp-client` and `glsp-server` sources and offers dedicated launch configurations to run and debug the example application.
+
+To open the workspace start a VS Code instance and use the `Open Workspace from File..` entry from the `File` menu.
+Then navigate to the directory containing the workspace file and open the `node-json-theia.code-workspace` file.
+
+For a smooth development experience we recommend a set of useful VS Code extensions. When the workspace is first opened VS Code will ask you wether you want to install those recommended extensions.
+Alternatively, you can also open the `Extension View` (Ctrl + Shift + X) and type `@recommended` into the search field to see the list of `Workspace Recommendations`.
 
 ## Project structure
 
