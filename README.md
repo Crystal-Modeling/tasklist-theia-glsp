@@ -1,55 +1,56 @@
 # Langium Model Server PoC
 
-## Prerequisites
+This repository contains the source code to build and demonstrate the work of Langium Model Server (LMS) within the example of `tasklist` visual and textual languages.
 
-The following libraries/frameworks need to be installed on your system:
+## Prerequisities
 
-- [Node.js](https://nodejs.org/en/) `>=14.18.0`
-- [Yarn](https://classic.yarnpkg.com/en/docs/install#debian-stable) `>=1.7.0`
+The most easy way to get started is to open the repository with VSCode and launch it from the Devcontainer:
 
-The examples are heavily interweaved with Eclipse Theia, so please also check the [prerequisites of Theia](https://github.com/eclipse-theia/theia/blob/master/doc/Developing.md#prerequisites).
+### Tools to have installed on the PC before building and starting the project
 
-## Theia Version compatibility
+1. [Git for Windows](https://git-scm.com/download/win);
+1. [VSCode IDE](https://code.visualstudio.com/download);
+1. [Docker Desktop for Windows](https://docs.docker.com/desktop/install/windows-install/).
 
-This project template is compatible with Theia `>=1.37.2`.
+### Opening this project in VSCode IDE
 
-## Building the example
+1. Launch Docker Desktop and VSCode
+2. In VSCode open the project as a folder by either ![Open Folder with a cloned repository or Clone Git Repository if not cloned yet](images/vscode-start-screen.png):
+  - Selecting "Open Folder" on the Starting screen of VSCode and navigating to the directory with cloned tasklist-theia-glsp repository (if you cloned it already from the GitHub)
+  - Selecting "Clone Git Repository" on the Starting screen of VSCode and paste this link: 'https://github.com/Crystal-Modeling/tasklist-theia-glsp.git'
+3. Once the project is opened, install "Remote Development" extension pack by pressing "Ctrl+Shift+X" and typing "Remote Development" and clicking "Install" on the first search result ![Install "Remote Development" extension pack](images/installing-extensions.png)
+4. Next, reopen project from the Devcontainer, cloning the repository to the Docker volume:
+  - Hit "Ctrl+Shift+P" to open VSCode command pallete
+  - Enter "clone repository in container volume" into the pallete prompt
+  - Click on "Dev Containers: Clone repository in container volume..." to execute command
+5. Wait until the project is opened, then switch to `demo/MSc-thesis` Git branch using the indicator on bottom-left ![Switch to demo/MSc-thesis branch](images/switching-git-branches.png)
 
-The server component and the client component have to be built using `yarn`.
-A convenience script to build both is provided.
-To build all components execute the following in the directory containing this README:
+## Launching the example
 
-```bash
-yarn build
-```
+Open new embedded terminal (Ctrl+Shift+`) and execute the following commands:
 
-Alternatively, it is possible to build each component individually:
-
-```bash
-# Build only the glsp-client
-yarn build:client
-
-# Build only glsp-server
-yarn build:server
-```
-
-### Building packaged VSCode extensions (tasklist-lang)
-
-❗ Before building tasklist-lang, ensure its source code is loaded to this repo from Git submodule:
-From [`glsp-server`](glsp-server) directory, execute the following from the embedded terminal:
+1. Initialize & update submodule for tasklist-lang
 
 ```bash
 git submodule init
 git submodule update
 ```
 
-To have tasklist-lang packaged into Theia build, it has to be built using the following command (from [`glsp-client/vsc-extensions/tasklist-lang`](glsp-client/vsc-extensions/tasklist-lang)) directory:
+2. Build all the components
 
 ```bash
-npm run package
+yarn build
 ```
 
-❗ You don't have to package it into VSIX file (though you could, with `npx vsce package` command).
+3. Open project workspace (in the container) to make launch configs available in the IDE ![Open workspace](images/opening-project-workspace.png)
+  - Open workspace file [tasklist-theia-glsp.code-workspace](tasklist-theia-glsp.code-workspace)
+  - Click "Open Workspace" in the top bottom corner
+
+4. Launch Theia with tasklist-lang extension and GLSP server ![Launch LMS demo IDE](images/launching-tasklist-demo.png)
+  - Open Run and Debug view (Ctrl+Shift+D)
+  - In the dropdown on the bottom-left select "Launch Tasklist Theia DEMO (workspace)" launch config
+  - Press green triangular on the dropdown left
+  - Upon this "localhost:3000" should get opened in your browser with Theia IDE UI loaded.
 
 ## Demoing the example
 
@@ -58,8 +59,6 @@ The following demonstration has been presented at the [TheiaCon 2023](https://ev
 LMS demonstrates an approach to use textual language as a source model for the diagrams.
 This approach enables editing the language models equally either by editing the model in text (as a textual code), or visually (on a diagram).
 This serves as a basis for modern open-source Low-code platforms, suggesting a technology to be used in platform IDE to add support for heterogeneous interactions with the model.
-
-1. Start Theia IDE and embedded GLSP server using "Launch Tasklist Theia DEMO" launch config
 
 ### TEXT EDITING (With diagram updates)
 
@@ -85,7 +84,7 @@ Technology, which enables rich editing capabilities for a textual editor (autoco
    task 2 "Vegetables"
    ```
 
-3. Demonstrate selection sync: Click on different text nodes (e.g., `slr`, then `proposal`) in 'shopping.tasks' on the left (watch how different nodes on the diagram get centered)
+3. Demonstrate selection sync: Click on different text nodes (e.g., `1`, then `2`) in 'shopping.tasks' on the left (watch how different nodes on the diagram get centered)
 4. Demonstrate saving sync: Save 'shopping.tasks' (watch 'shopping.tasklist' gets saved automatically)
 5. Demonstrate invalid models are not exposed (not digested to the diagram server) by replacing the content of the editor with the following:
 
@@ -152,6 +151,19 @@ Langium Model Server brings extra advantages: rich _editing_ of the model from t
 
 11. Demonstrate how GLSP diagram consumes LSP validation by using LMS validation endpoint:
    - Click 'Validate model' button on GLSP diagram pallete -- watch the validation markers (❕and ❌ appear on the invalid Task nodes and Transition edge), which, when hovered, displays exactly the same validation message, as the one observable in the LSP text editor.
+
+## Version compatibility
+
+The following libraries/frameworks need to be installed on your system:
+
+- [Node.js](https://nodejs.org/en/) `>=14.18.0`
+- [Yarn](https://classic.yarnpkg.com/en/docs/install#debian-stable) `>=1.7.0`
+
+The examples are heavily interweaved with Eclipse Theia, so please also check the [prerequisites of Theia](https://github.com/eclipse-theia/theia/blob/master/doc/Developing.md#prerequisites).
+
+### Theia Version compatibility
+
+This project template is compatible with Theia `>=1.37.2`.
 
 ## VS Code workspace
 
